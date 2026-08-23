@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SteamDesktopAuthenticator.Views.ImportAccountWindow"
+        Width="440" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgPanelBrush}"
+        Title="Add Account">
+  <Border Padding="24" CornerRadius="12">
+    <StackPanel Spacing="16">
+      <TextBlock Classes="h1" Text="Add Account"/>
+      <TextBlock Classes="muted" TextWrapping="Wrap"
+                 Text="Link a brand-new Steam Guard authenticator to this app, or import one or more existing .maFiles exported from another SDA installation."/>
+
+      <Button Classes="primary" Content="Login &amp; Link New Authenticator" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnLoginNewClick"/>
+
+      <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,4"/>
+
+      <TextBlock Classes="h2" Text="Import existing .maFiles"/>
+      <StackPanel Spacing="6">
+        <TextBlock Classes="muted" Text="Encryption key (leave blank if the source files aren't encrypted). The same key is used for every file you select."/>
+        <TextBox x:Name="EncryptionKeyBox" PasswordChar="•"/>
+      </StackPanel>
+      <TextBlock x:Name="StatusText" Classes="muted" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" IsVisible="False"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="secondary" Content="Close" Click="OnCloseClick"/>
+        <Button Classes="primary" Content="Choose .maFile(s)…" Click="OnBrowseClick"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

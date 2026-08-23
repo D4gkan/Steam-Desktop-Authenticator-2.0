@@ -1,0 +1,181 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SteamDesktopAuthenticator.ViewModels"
+        x:Class="SteamDesktopAuthenticator.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1240" Height="680" MinWidth="980" MinHeight="520"
+        Title="Steam Desktop Authenticator"
+        Background="{DynamicResource BgRootBrush}">
+
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <!-- Top bar -->
+    <Border Grid.Row="0" Background="{DynamicResource BgPanelBrush}" Padding="20,14" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
+        <TextBlock Grid.Column="0" Classes="h1" Text="Steam Desktop Authenticator" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="2" Width="240" Watermark="Search accounts…" Text="{Binding SearchText}" Margin="0,0,12,0"/>
+        <Button Grid.Column="3" Classes="secondary" Content="🔒 Setup Encryption" Click="OnSetupEncryptionClick" Margin="0,0,8,0"
+                IsVisible="{Binding !IsManifestEncrypted}"
+                ToolTip.Tip="Encrypt maFiles/manifest.json with a passkey - locks the maFiles as well"/>
+        <Button Grid.Column="3" Classes="secondary" Content="🔓 Remove Encryption" Click="OnRemoveEncryptionClick" Margin="0,0,8,0"
+                IsVisible="{Binding IsManifestEncrypted}"
+                ToolTip.Tip="Decrypt every maFile back to plain text"/>
+        <Button Grid.Column="4" Classes="secondary" Content="＋ Add Account" Click="OnAddAccountClick" Margin="0,0,8,0"/>
+        <Button Grid.Column="5" Classes="icon" Content="⚙" FontSize="18" Click="OnSettingsClick" ToolTip.Tip="Settings"/>
+      </Grid>
+    </Border>
+
+    <!-- Main content -->
+    <Grid Grid.Row="1" ColumnDefinitions="520,Auto,*">
+
+      <!-- Left: account list -->
+      <Border Grid.Column="0" MinWidth="440" Background="{DynamicResource BgRootBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+        <ScrollViewer Padding="12,12,12,0">
+            <StackPanel>
+            <ItemsControl x:Name="AccountsList" ItemsSource="{Binding DisplayedAccounts}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:AccountViewModel">
+                  <Border Classes="card account-card" Margin="0,0,0,10" Padding="14,12" Tag="{Binding}">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto">
+                      <!-- Avatar circle with initial -->
+                      <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="38" Height="38" CornerRadius="19"
+                              Background="{DynamicResource AccentBrush}" Margin="0,0,12,0">
+                        <TextBlock Text="{Binding DisplayName[0]}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="Bold" Foreground="#04231D" FontSize="16"/>
+                      </Border>
+
+                      <!-- Middle: name/badges + code/progress. MinWidth=0 lets this column shrink instead of
+                           pushing its siblings out of the card, so the action button is never squeezed off. -->
+                      <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" RowDefinitions="Auto,Auto" MinWidth="0" Margin="0,0,10,0">
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" MinWidth="0">
+                          <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                                     TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                          <Border Grid.Column="1" IsVisible="{Binding !Enabled}" Background="{DynamicResource BorderBrush}" CornerRadius="4" Padding="5,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="disabled" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+                          </Border>
+                          <Border Grid.Column="2" IsVisible="{Binding HasPendingConfirmations}" Background="{DynamicResource AccentBrush}" CornerRadius="9" Padding="6,1" MinWidth="18" Margin="6,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding PendingConfirmationCount}" FontSize="10" FontWeight="Bold" Foreground="#04231D" HorizontalAlignment="Center"/>
+                          </Border>
+                        </Grid>
+
+                        <!-- Grid instead of StackPanel: the code text ellipsizes within its own column
+                             rather than growing the row wider than the space the card actually has. -->
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*" MinWidth="0" Margin="0,4,0,0">
+                          <TextBlock Grid.Column="0" Classes="code" Text="{Binding Code}" TextTrimming="CharacterEllipsis"
+                                     MaxWidth="90" VerticalAlignment="Center"/>
+                          <Button Grid.Column="1" Classes="icon" Padding="3" Width="22" Height="22" FontSize="12"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  Margin="4,0,0,0" Cursor="Hand"
+                                  Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).CopyCodeCommand}"
+                                  CommandParameter="{Binding}" ToolTip.Tip="Copy code">
+                            <TextBlock Text="⧉" FontSize="12"/>
+                          </Button>
+                          <ProgressBar Grid.Column="2" Value="{Binding CodeProgress}" Minimum="0" Maximum="1" Width="60" Height="4"
+                                       HorizontalAlignment="Right" Margin="10,0,0,0"
+                                       VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}"
+                                       Background="{DynamicResource BorderBrush}"/>
+                        </Grid>
+                      </Grid>
+
+                      <!-- Reorder buttons: replaces drag-and-drop entirely. Fixed size, own reserved
+                           column, spans both rows and vertically centered on the whole card. -->
+                      <StackPanel Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical" Spacing="2"
+                                  VerticalAlignment="Center" Margin="0,0,4,0">
+                        <Button Classes="icon" Content="▲" FontSize="9" Padding="0" Width="20" Height="16"
+                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).MoveAccountUpCommand}"
+                                CommandParameter="{Binding}" ToolTip.Tip="Move up"/>
+                        <Button Classes="icon" Content="▼" FontSize="9" Padding="0" Width="20" Height="16"
+                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).MoveAccountDownCommand}"
+                                CommandParameter="{Binding}" ToolTip.Tip="Move down"/>
+                      </StackPanel>
+
+                      <!-- Action button: fixed size, own reserved column, spans both rows and is vertically
+                           centered on the whole card so it can never be clipped or squeezed by its neighbors. -->
+                      <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Classes="icon" Content="⋮" FontSize="16" Padding="4"
+                              Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center"
+                              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                              Click="OnAccountMenuClick" Tag="{Binding}"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <!-- Spacer: guarantees room to scroll the last card fully clear of the viewport
+                 bottom edge, regardless of how the platform handles ScrollViewer padding. -->
+            <Border Height="120"/>
+            </StackPanel>
+        </ScrollViewer>
+      </Border>
+
+      <GridSplitter Grid.Column="1" Width="5" Background="{DynamicResource BorderBrush}" ResizeDirection="Columns"/>
+
+      <!-- Right: confirmations panel (dashboard-only, per spec) -->
+      <Grid Grid.Column="2" RowDefinitions="Auto,*" Margin="20">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,14">
+          <TextBlock Grid.Column="0" Classes="h2" Text="{Binding ConfirmationCount, StringFormat='Confirmations ({0})'}" VerticalAlignment="Center"/>
+          <Button Grid.Column="1" Classes="secondary" Content="⟳ Refresh" Margin="0,0,8,0"
+                  Command="{Binding RefreshConfirmationsCommand}" IsEnabled="{Binding !IsBusy}"
+                  ToolTip.Tip="Check for new trade/market confirmations now"/>
+          <Button Grid.Column="2" Classes="secondary" Content="Reject All" Margin="0,0,8,0"
+                  Command="{Binding RejectAllCommand}" IsEnabled="{Binding !IsBusy}"/>
+          <Button Grid.Column="3" Classes="primary" Content="Confirm All"
+                  Command="{Binding ConfirmAllCommand}" IsEnabled="{Binding !IsBusy}"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" Padding="0">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="muted" Text="No pending confirmations." IsVisible="{Binding !HasConfirmations}" Margin="4,20"/>
+            <ItemsControl ItemsSource="{Binding Confirmations}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ConfirmationViewModel">
+                  <Border Classes="card" Padding="16">
+                    <Grid ColumnDefinitions="6,14,*,14,Auto">
+                      <Border Grid.Column="0" Background="{DynamicResource TradeAccentBrush}" CornerRadius="3"/>
+                      <StackPanel Grid.Column="2" Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding AccountLabel}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontSize="12"/>
+                          <Border Background="{DynamicResource BgPanelBrush}" CornerRadius="4" Padding="6,1">
+                            <TextBlock Text="{Binding TypeLabel}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                          </Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Headline}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding Summary}" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding Summary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Button Classes="danger" Content="Reject"
+                                Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).RejectOneCommand}"
+                                CommandParameter="{Binding}"/>
+                        <Button Classes="primary" Content="Confirm"
+                                Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).ConfirmOneCommand}"
+                                CommandParameter="{Binding}"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <!-- Spacer: same fix as the account list - guarantees the last card can scroll fully
+                 clear of the viewport bottom edge. -->
+            <Border Height="120"/>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Grid>
+
+    <!-- Status bar -->
+    <Border Grid.Row="2" Background="{DynamicResource BgPanelBrush}" Padding="20,6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+      <TextBlock Text="v2.0.0" Classes="muted" FontSize="11" HorizontalAlignment="Right"/>
+    </Border>
+
+    <!-- Locked overlay -->
+    <Border Grid.Row="0" Grid.RowSpan="3" Background="#CC0E1116" IsVisible="{Binding !IsUnlocked}">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14" Width="320">
+        <TextBlock Classes="h1" Text="Locked" HorizontalAlignment="Center"/>
+        <TextBlock Classes="muted" Text="{Binding StatusMessage}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+        <Button Classes="primary" Content="Enter Passkey" HorizontalAlignment="Center" Click="OnUnlockClick"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

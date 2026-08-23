@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SteamDesktopAuthenticator.Views.SettingsWindow"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgPanelBrush}"
+        Title="Settings">
+  <Border Padding="24" CornerRadius="12">
+    <StackPanel Spacing="16">
+      <TextBlock Classes="h1" Text="Settings"/>
+
+      <CheckBox x:Name="PeriodicCheckingBox" Content="Periodically check for confirmations" Checked="OnPeriodicCheckingChanged" Unchecked="OnPeriodicCheckingChanged"/>
+
+      <StackPanel Spacing="6" Margin="24,0,0,0">
+        <TextBlock Classes="muted" Text="Check interval (minutes)"/>
+        <NumericUpDown x:Name="IntervalBox" Minimum="1" Maximum="60" Increment="1" Width="140" HorizontalAlignment="Left"/>
+        <CheckBox x:Name="CheckAllBox" Content="Check all accounts, not just the selected one"/>
+        <CheckBox x:Name="ConfirmMarketBox" Content="Auto-confirm market transactions" Checked="OnConfirmMarketChecked"/>
+        <CheckBox x:Name="ConfirmTradesBox" Content="Auto-confirm trades" Checked="OnConfirmTradesChecked"/>
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="secondary" Content="Cancel" Click="OnCancelClick"/>
+        <Button Classes="primary" Content="Save" Click="OnSaveClick"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

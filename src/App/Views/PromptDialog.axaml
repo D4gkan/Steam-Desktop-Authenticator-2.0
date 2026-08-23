@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SteamDesktopAuthenticator.Views.PromptDialog"
+        Width="420" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgPanelBrush}"
+        SystemDecorations="Full"
+        Title="Steam Desktop Authenticator">
+  <Border Padding="24" CornerRadius="12">
+    <StackPanel Spacing="16">
+      <TextBlock x:Name="TitleText" Classes="h2" TextWrapping="Wrap"/>
+      <TextBlock x:Name="MessageText" Classes="muted" TextWrapping="Wrap"/>
+      <TextBox x:Name="InputBox" Watermark="" IsVisible="False"/>
+      <StackPanel x:Name="ButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button x:Name="CancelButton" Classes="secondary" Content="Cancel" Click="OnCancelClick"/>
+        <Button x:Name="NoButton" Classes="secondary" Content="No" Click="OnNoClick" IsVisible="False"/>
+        <Button x:Name="OkButton" Classes="primary" Content="OK" Click="OnOkClick"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

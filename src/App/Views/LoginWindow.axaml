@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SteamDesktopAuthenticator.Views.LoginWindow"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgPanelBrush}"
+        Title="Steam Login">
+  <Border Padding="24" CornerRadius="12">
+    <StackPanel Spacing="16">
+      <TextBlock Classes="h1" Text="Steam Login"/>
+      <TextBlock x:Name="ExplanationText" Classes="muted" TextWrapping="Wrap"/>
+
+      <StackPanel Spacing="6">
+        <TextBlock Classes="muted" Text="Username"/>
+        <TextBox x:Name="UsernameBox"/>
+      </StackPanel>
+      <StackPanel Spacing="6">
+        <TextBlock Classes="muted" Text="Password"/>
+        <TextBox x:Name="PasswordBox" PasswordChar="•"/>
+      </StackPanel>
+
+      <TextBlock x:Name="StatusText" Classes="muted" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" IsVisible="False"/>
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="secondary" Content="Cancel" Click="OnCancelClick"/>
+        <Button x:Name="LoginButton" Classes="primary" Content="Login" Click="OnLoginClick"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

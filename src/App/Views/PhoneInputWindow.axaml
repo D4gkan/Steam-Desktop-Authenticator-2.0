@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SteamDesktopAuthenticator.Views.PhoneInputWindow"
+        Width="380" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgPanelBrush}"
+        Title="Add Phone Number">
+  <Border Padding="24" CornerRadius="12">
+    <StackPanel Spacing="14">
+      <TextBlock Classes="h2" Text="A phone number is required to link an authenticator." TextWrapping="Wrap"/>
+      <StackPanel Spacing="6">
+        <TextBlock Classes="muted" Text="Phone number (with country dialing code, e.g. +1 555 555 1234)"/>
+        <TextBox x:Name="PhoneNumberBox" Watermark="+1 555 555 1234"/>
+      </StackPanel>
+      <StackPanel Spacing="6">
+        <TextBlock Classes="muted" Text="Country code (2 letters, e.g. US)"/>
+        <TextBox x:Name="CountryCodeBox" Watermark="US" MaxLength="2"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="secondary" Content="Cancel" Click="OnCancelClick"/>
+        <Button Classes="primary" Content="Continue" Click="OnContinueClick"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</Window>

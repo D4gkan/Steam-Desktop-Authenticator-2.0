@@ -1,0 +1,169 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- Base surfaces -->
+      <Color x:Key="BgRootColor">#0E1116</Color>
+      <Color x:Key="BgPanelColor">#161B22</Color>
+      <Color x:Key="BgCardColor">#1B212B</Color>
+      <Color x:Key="BgCardHoverColor">#222A36</Color>
+      <Color x:Key="BorderColor">#2A313D</Color>
+
+      <!-- Text -->
+      <Color x:Key="TextPrimaryColor">#EDEFF3</Color>
+      <Color x:Key="TextSecondaryColor">#9099A8</Color>
+      <Color x:Key="TextMutedColor">#616B7A</Color>
+
+      <!-- Accent: teal/green -->
+      <Color x:Key="AccentColor">#2FBF9F</Color>
+      <Color x:Key="AccentHoverColor">#4CD3B5</Color>
+      <Color x:Key="AccentPressedColor">#249E82</Color>
+
+      <Color x:Key="SuccessColor">#3FBF7F</Color>
+      <Color x:Key="DangerColor">#E5636B</Color>
+      <Color x:Key="TradeColor">#5B9EE8</Color>
+      <Color x:Key="MarketColor">#B98CE0</Color>
+
+      <SolidColorBrush x:Key="BgRootBrush" Color="{StaticResource BgRootColor}"/>
+      <SolidColorBrush x:Key="BgPanelBrush" Color="{StaticResource BgPanelColor}"/>
+      <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCardColor}"/>
+      <SolidColorBrush x:Key="BgCardHoverBrush" Color="{StaticResource BgCardHoverColor}"/>
+      <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}"/>
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+      <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}"/>
+      <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+      <SolidColorBrush x:Key="AccentHoverBrush" Color="{StaticResource AccentHoverColor}"/>
+      <SolidColorBrush x:Key="AccentPressedBrush" Color="{StaticResource AccentPressedColor}"/>
+      <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+      <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
+
+      <SolidColorBrush x:Key="NeutralAccentBrush" Color="{StaticResource TextSecondaryColor}"/>
+      <SolidColorBrush x:Key="TradeAccentBrush" Color="{StaticResource TradeColor}"/>
+      <SolidColorBrush x:Key="MarketAccentBrush" Color="{StaticResource MarketColor}"/>
+      <SolidColorBrush x:Key="DangerAccentBrush" Color="{StaticResource DangerColor}"/>
+
+      <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+      <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+      <CornerRadius x:Key="RadiusLg">16</CornerRadius>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource BgRootBrush}"/>
+    <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif"/>
+    <Setter Property="TransparencyLevelHint" Value="None"/>
+  </Style>
+
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+    <Setter Property="Foreground" Value="#04231D"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="14,8"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.12"/>
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+  </Style>
+  <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentPressedBrush}"/>
+  </Style>
+
+  <Style Selector="Button.secondary">
+    <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="14,8"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="Button.secondary:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource BgCardHoverBrush}"/>
+  </Style>
+
+  <Style Selector="Button.danger">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource DangerBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="14,8"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+
+  <Style Selector="Button.icon">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="6"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="Button.icon:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource BgCardHoverBrush}"/>
+  </Style>
+
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="{StaticResource BgPanelBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
+    <Setter Property="SelectionBrush" Value="#402FBF9F"/>
+  </Style>
+  <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+  </Style>
+
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.12"/>
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border.card:pointerover">
+    <Setter Property="Background" Value="{StaticResource BgCardHoverBrush}"/>
+  </Style>
+
+  <Style Selector="Border.account-card">
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusLg}"/>
+  </Style>
+
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="20"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+  </Style>
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontSize" Value="14"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    <Setter Property="FontSize" Value="12"/>
+  </Style>
+  <Style Selector="TextBlock.code">
+    <Setter Property="FontFamily" Value="Consolas, Cascadia Mono, monospace"/>
+    <Setter Property="FontSize" Value="22"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="LetterSpacing" Value="2"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+  </Style>
+
+</Styles>
