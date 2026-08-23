@@ -166,7 +166,16 @@
 
     <!-- Status bar -->
     <Border Grid.Row="2" Background="{DynamicResource BgPanelBrush}" Padding="20,6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
-      <TextBlock Text="v2.0.0" Classes="muted" FontSize="11" HorizontalAlignment="Right"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <!-- Was previously write-only: MainWindowViewModel already sets StatusMessage on every
+             poll failure (expired session, missing device id, network/time-sync errors, etc.),
+             but nothing rendered it once the app was unlocked, so those failures were invisible.
+             This is very likely why confirmations silently stopped appearing - something is
+             failing per-account in the background and there was no way to see what. -->
+        <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Classes="muted" FontSize="11"
+                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="1" Text="v2.0.0" Classes="muted" FontSize="11" HorizontalAlignment="Right" Margin="12,0,0,0"/>
+      </Grid>
     </Border>
 
     <!-- Locked overlay -->
