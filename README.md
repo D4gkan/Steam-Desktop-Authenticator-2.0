@@ -144,8 +144,8 @@ Wherever you extract the app, make sure it's somewhere you'll **remember and bac
 
 <table>
 <tr><td>1️⃣</td><td>Open Steam Desktop Authenticator and choose to set up a new account.</td></tr>
-<tr><td>2️⃣</td><td>Log in with your Steam username and password. <b>You still need a phone that can receive SMS</b> for the initial linking step — Steam requires this to add a new authenticator.</td></tr>
-<tr><td>3️⃣</td><td>Enter the SMS code Steam sends you to confirm the phone number.</td></tr>
+<tr><td>2️⃣</td><td>Log in with your Steam username and password. Steam will send a verification code by SMS if a phone number is connected to your account, or by email if it is not.</td></tr>
+<tr><td>3️⃣</td><td>Enter the verification code Steam sends you to confirm the login.</td></tr>
 <tr><td>4️⃣</td><td>SDA generates and links a new mobile authenticator to your account, the same as the official app would.</td></tr>
 <tr><td>5️⃣</td><td><b>Write down your revocation code</b> when it's shown. This is your emergency key if you ever lose your files — store it somewhere safe and offline.</td></tr>
 <tr><td>6️⃣</td><td>You'll be asked whether to set up encryption for your local files. This is optional but <b>highly recommended</b>.</td></tr>
@@ -262,7 +262,7 @@ It's as safe as the computer it runs on. Because SDA stores your authenticator s
 <details>
 <summary><b>Do I need a phone at all?</b></summary>
 <br>
-Yes, at least once. Steam requires SMS verification of a phone number when you first link a mobile authenticator to an account, even if all future logins happen through SDA.
+No. A phone number is not mandatory. If your Steam account does not have a phone number connected, Steam sends the verification code by email instead, and SDA works normally.
 </details>
 
 <details>
