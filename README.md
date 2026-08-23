@@ -44,6 +44,7 @@
 - [Backups & disaster recovery](#-backups--disaster-recovery)
 - [Troubleshooting](#-troubleshooting)
 - [FAQ](#-faq)
+- [Credits](#-credits)
 - [Contributing & support](#-contributing--support)
 
 ---
@@ -275,6 +276,12 @@ You won't be able to decrypt your local <code>maFiles</code>. Your only path bac
 <br>
 Yes, by copying your <code>maFiles</code> folder between machines (or importing individual <code>.maFile</code>s). Keep in mind that whoever holds a copy of an unencrypted <code>maFile</code> can generate codes and approve confirmations for that account, so treat every copy as sensitive.
 </details>
+
+---
+
+## 🙌 Credits
+
+Special thanks to **Jessecar96** ([@jessecar96](https://github.com/jessecar96)), the original creator of [Steam Desktop Authenticator](https://github.com/jessecar96/steamdesktopauthenticator), and all contributors to the original project.
 
 ---
 
