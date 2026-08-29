@@ -20,6 +20,11 @@ namespace SteamDesktopAuthenticator.ViewModels
             Confirmation.EMobileConfirmationType.AccountRecovery => "Account Recovery",
             Confirmation.EMobileConfirmationType.FeatureOptOut => "Feature Opt-Out",
             Confirmation.EMobileConfirmationType.Test => "Test",
+            // Steam sent a type this build doesn't recognize yet. Rather than inventing a label,
+            // fall back to whatever human-readable name Steam itself included (type_name), and
+            // only fall further back to a generic label if even that is missing.
+            Confirmation.EMobileConfirmationType.Unknown when !string.IsNullOrWhiteSpace(Confirmation.TypeName) => Confirmation.TypeName,
+            Confirmation.EMobileConfirmationType.Unknown => "Unrecognized Confirmation",
             _ => "Confirmation"
         };
 
@@ -32,6 +37,11 @@ namespace SteamDesktopAuthenticator.ViewModels
             Confirmation.EMobileConfirmationType.PhoneNumberChange => "DangerAccentBrush",
             _ => "NeutralAccentBrush"
         };
+
+        /// <summary>True for confirmation types Steam has documented but this account's SDA
+        /// build doesn't have a dedicated label/handling for yet (Task 12). Bound by the view to
+        /// show a small "unrecognized" note so nothing is silently hidden.</summary>
+        public bool IsUnrecognizedType => Confirmation.ConfType == Confirmation.EMobileConfirmationType.Unknown;
 
         public ConfirmationViewModel(Confirmation confirmation, AccountViewModel owner)
         {

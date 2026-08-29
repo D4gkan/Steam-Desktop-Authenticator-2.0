@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SteamAuth;
 using SteamDesktopAuthenticator.Core;
+using SteamDesktopAuthenticator.Core.Security;
 using SteamDesktopAuthenticator.Services;
 using SteamKit2;
 using SteamKit2.Authentication;
@@ -32,13 +33,33 @@ namespace SteamDesktopAuthenticator.Views
         /// flow finishes successfully.</summary>
         public SteamGuardAccount? LinkedAccount { get; private set; }
 
+        /// <summary>Task 1 UI: whether "Save password for automatic re-login" was checked at the
+        /// moment login succeeded. Callers (MainWindow's Refresh Login flow, the Initial/Import
+        /// flows below) use this together with <see cref="EnteredPassword"/> to decide whether to
+        /// write the password into the OS-native secure credential store.</summary>
+        public bool SavePasswordRequested { get; private set; }
+
+        /// <summary>The password that was entered, only if login succeeded AND the save-password
+        /// checkbox was checked - null otherwise. Cleared as soon as a caller has read it once
+        /// (see <see cref="ConsumeEnteredPassword"/>) so it does not linger in memory longer than
+        /// necessary.</summary>
+        public string? EnteredPassword { get; private set; }
+
+        /// <summary>Reads and immediately clears <see cref="EnteredPassword"/>.</summary>
+        public string? ConsumeEnteredPassword()
+        {
+            var p = EnteredPassword;
+            EnteredPassword = null;
+            return p;
+        }
+
         /// <summary>Design-time/XAML-loader constructor only. Not used at runtime - the app always
         /// constructs this window via the (IDialogService, LoginType, SteamGuardAccount?) overload below.</summary>
         public LoginWindow() : this(null!)
         {
         }
 
-        public LoginWindow(IDialogService dialogService, LoginType loginReason = LoginType.Initial, SteamGuardAccount? account = null)
+        public LoginWindow(IDialogService dialogService, LoginType loginReason = LoginType.Initial, SteamGuardAccount? account = null, bool initialSavePasswordChecked = false)
         {
             InitializeComponent();
             _dialogService = dialogService;
@@ -50,6 +71,8 @@ namespace SteamDesktopAuthenticator.Views
                 UsernameBox.Text = account.AccountName;
                 UsernameBox.IsEnabled = false;
             }
+
+            SavePasswordCheckBox.IsChecked = initialSavePasswordChecked;
 
             ExplanationText.Text = loginReason switch
             {
@@ -134,6 +157,13 @@ namespace SteamDesktopAuthenticator.Views
                 RefreshToken = pollResponse.RefreshToken,
             };
             Session = sessionData;
+
+            // Task 1: capture the save-password checkbox state now, while we still have the
+            // plaintext password in hand. Nothing is written to the credential store here -
+            // that decision (and the matching ui-meta.json flag) belongs to whichever caller
+            // owns the account's UiMetaStore entry, so it stays a single source of truth.
+            SavePasswordRequested = SavePasswordCheckBox.IsChecked == true;
+            EnteredPassword = SavePasswordRequested ? password : null;
 
             if (_loginReason == LoginType.Import)
             {

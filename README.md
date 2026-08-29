@@ -8,7 +8,7 @@
 
 <sub><b>We are not affiliated with Steam or Scrap.TF in any way!</b> This project is run by community volunteers.</sub>
 
-[![Latest Release](https://img.shields.io/badge/version-2.0.0-3fb950?style=for-the-badge)](#-download--install)
+[![Latest Release](https://img.shields.io/badge/version-2.0.1-3fb950?style=for-the-badge)](#-download--install)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20(beta)-0078D6?style=for-the-badge&logo=linux)](#-download--install)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
@@ -57,6 +57,8 @@ Steam Desktop Authenticator recreates the core functionality of the official Ste
 - Lets you **approve or deny trade offers and market listings** that require mobile confirmation.
 - Manages **multiple Steam accounts** side by side, each with its own authenticator file (`maFile`).
 - Optionally **encrypts** those files with a password so a stolen copy of your `maFiles` folder isn't immediately usable.
+- Can **save a password in the OS-native secure credential store** for automatic session recovery when a Steam session expires.
+- Includes **session refresh and re-login recovery logic** to keep confirmations and login token generation working after a stale session.
 
 It's aimed at people who manage several Steam accounts (traders, bot operators, community volunteers) and need authenticator access without juggling multiple phones.
 
@@ -70,13 +72,16 @@ It's aimed at people who manage several Steam accounts (traders, bot operators, 
 | 👥 **Multi-account management** | Add, import, rename, reorder (move up/down), and remove as many linked accounts as you want from one window. |
 | 🔍 **Search & filter** | Instantly filter your account list by name as you type. |
 | ✅ **Trade confirmations** | View all pending trade offers and market listings across your accounts, with details on what's being confirmed. |
+| 🧯 **Crash-safe confirmation parsing** | Unknown confirmation types are surfaced safely instead of breaking the entire confirmation fetch for an account. |
 | ⚡ **Confirm / Reject, individually or in bulk** | Approve or deny a single confirmation, or use **Confirm All** / **Reject All** to clear the whole queue at once. |
 | 🤖 **Auto-confirm rules** | Optionally auto-confirm market transactions and/or trades automatically, without manual approval. |
 | ⏱️ **Background polling** | Periodically checks for new confirmations in the background so the list stays current — configurable to check only the selected account or all of them. |
 | 🔒 **Optional file encryption** | Protects your local `maFiles` with a password/passkey so they can't be used as-is if someone copies them off your machine. |
+| 🔐 **Secure password save for auto re-login** | Saves the account password in the OS-native credential store (Windows Credential Manager, macOS Keychain, or Linux Secret Service) instead of inside a plain text config file. |
 | ➕ **Add new authenticator** | Log in to Steam directly from the app and link a brand-new mobile authenticator to an account. |
 | 📥 **Import existing maFile(s)** | Bring in authenticator files you already have (e.g. from another install or backup) via a simple file picker — single or batch import supported. |
 | 📇 **Session refresh & re-login** | Force-refresh a stale Steam session or fully re-authenticate an account without losing its linked authenticator. |
+| 🔄 **Automatic re-login recovery** | When a session expires, SDA can retry with the saved password and recover automatically, with backoff/cooldown guarding. |
 | ❌ **Deactivate authenticator** | Safely remove Steam Guard from an account (with a confirmation-code sanity check) directly from the app, mirroring Steam's own safety flow. |
 | 🖱️ **Quick-copy codes** | One click copies the current login code to your clipboard. |
 | 🧩 **Per-account enable/disable** | Temporarily disable an account's authenticator polling without deleting it. |
@@ -112,7 +117,7 @@ dotnet publish src/App/App.csproj -c Release -r linux-x64 --self-contained -p:Pu
 ### 🪟 Windows
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.0/SteamDesktopAuthenticator-v2.0.0-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.0-win-x64.zip</code></a>.</td></tr>
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.1/SteamDesktopAuthenticator-v2.0.1-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.1-win-x64.zip</code></a>.</td></tr>
 <tr><td>2️⃣</td><td>Right-click the downloaded zip and choose <b>Extract All…</b> (or use 7-Zip/WinRAR) to a <b>safe, permanent folder</b> — e.g. <code>C:\SDA</code>. Don't run it from inside your Downloads or a temp folder, since losing this folder later can mean losing access to your Steam account(s).</td></tr>
 <tr><td>3️⃣</td><td>Open the extracted folder and double-click <b>SteamDesktopAuthenticator.exe</b> to launch the app.</td></tr>
 <tr><td>4️⃣</td><td>If Windows SmartScreen shows a warning (common for apps without a paid code-signing certificate), click <b>More info → Run anyway</b>.</td></tr>
@@ -123,8 +128,8 @@ No separate .NET install is required — the Windows build is self-contained.
 ### 🐧 Linux
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.0/SteamDesktopAuthenticator-v2.0.0-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.0-linux-x64.zip</code></a>.</td></tr>
-<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.0-linux-x64.zip -d ~/SDA
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.1/SteamDesktopAuthenticator-v2.0.1-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.1-linux-x64.zip</code></a>.</td></tr>
+<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.1-linux-x64.zip -d ~/SDA
 cd ~/SDA</pre></td></tr>
 <tr><td>3️⃣</td><td>Make the binary executable (only needs to be done once):<br><pre>chmod +x SteamDesktopAuthenticator</pre></td></tr>
 <tr><td>4️⃣</td><td>Launch it:<br><pre>./SteamDesktopAuthenticator</pre>Or double-click it from your file manager if it's set to allow executing files.</td></tr>
@@ -148,7 +153,7 @@ Wherever you extract the app, make sure it's somewhere you'll **remember and bac
 <tr><td>3️⃣</td><td>Enter the verification code Steam sends you to confirm the login.</td></tr>
 <tr><td>4️⃣</td><td>SDA generates and links a new mobile authenticator to your account, the same as the official app would.</td></tr>
 <tr><td>5️⃣</td><td><b>Write down your revocation code</b> when it's shown. This is your emergency key if you ever lose your files — store it somewhere safe and offline.</td></tr>
-<tr><td>6️⃣</td><td>You'll be asked whether to set up encryption for your local files. This is optional but <b>highly recommended</b>.</td></tr>
+<tr><td>6️⃣</td><td>You'll be asked whether to set up encryption for your local files. This is optional but <b>highly recommended</b>. On v2.0.1+, you can also choose to save the password in your OS secure credential store so SDA can attempt automatic recovery after a session expires.</td></tr>
 <tr><td>7️⃣</td><td>Get your <b>Steam Guard backup codes</b> at <a href="https://store.steampowered.com/twofactor/manage">store.steampowered.com/twofactor/manage</a> → "Get Backup Codes" — print or save them somewhere safe.</td></tr>
 </table>
 
@@ -178,6 +183,7 @@ The right panel shows all **pending confirmations** — trades and market listin
 - Approve or deny a single item directly on its card.
 - Use **Confirm All** or **Reject All** to process every pending confirmation at once.
 - Enable **"Periodically check for confirmations"** in Settings so this list updates automatically in the background — either for the selected account only, or across all accounts.
+- v2.0.1 also includes safety handling for previously unsupported or unknown confirmation types so one uncommon Steam response doesn't break the entire queue for that account.
 
 ### Adding another account
 
@@ -205,6 +211,7 @@ Open **⚙ Settings** to configure:
 |---|---|
 | Periodically check for confirmations | Turns on automatic background polling. |
 | Check all accounts, not just the selected one | Expands polling to every account instead of just the one you're viewing. |
+| Save password for automatic re-login | Stores the account password in the OS-secure credential store and lets SDA retry a re-login when a session expires. |
 | Auto-confirm market transactions | Automatically approves market-related confirmations as they arrive. |
 | Auto-confirm trades | Automatically approves trade confirmations as they arrive. |
 
@@ -246,6 +253,11 @@ This mirrors the safety flow of Steam's own authenticator removal, so you can't 
 **Trade confirmation list is blank or just white**
 1. Open the **Selected Account** menu and click **Force session refresh**.
 2. If that doesn't help, open the **Selected Account** menu again and click **Login again**, then sign back in to your Steam account.
+3. If Steam is returning a previously unseen confirmation type, v2.0.1 includes safer handling so that one unknown type no longer kills the rest of the confirmation list for that account.
+
+**Automatic re-login fails**
+1. Make sure the account is configured to **save its password for automatic re-login** in the OS credential store.
+2. If Steam requires a fresh verification code or a new login challenge, re-authentication may still need direct user action.
 
 If your issue isn't listed here or nothing above fixes it, please open an issue on the issue tracker. When sharing logs, upload them to a paste service like [Pastebin](http://www.pastebin.com) rather than pasting large blocks directly into the issue.
 

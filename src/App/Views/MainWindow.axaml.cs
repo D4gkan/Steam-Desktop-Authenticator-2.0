@@ -26,7 +26,7 @@ namespace SteamDesktopAuthenticator.Views
         {
             if (_vm == null) return;
             var window = new ImportAccountWindow(_vm.DialogService);
-            window.AccountAdded += account => _vm.AddImportedAccount(account);
+            window.AccountAdded += (account, saveLoginRequested, password) => _vm.AddImportedAccount(account, saveLoginRequested, password);
             await window.ShowDialog(this);
         }
 
@@ -76,9 +76,19 @@ namespace SteamDesktopAuthenticator.Views
             var reloginItem = new MenuItem { Header = "Refresh Login…" };
             reloginItem.Click += async (_, _) =>
             {
-                var loginWindow = new LoginWindow(_vm.DialogService, LoginType.Refresh, account.Account);
-                await loginWindow.ShowDialog(this);
+                var loginWindow = new LoginWindow(_vm.DialogService, LoginType.Refresh, account.Account, account.Meta.SaveLoginEnabled);
+                var ok = await loginWindow.ShowDialog<bool>(this);
+                if (ok)
+                {
+                    // Task 1: reflect whatever the person chose in this login (checked, or
+                    // unchecked to remove a previously saved password) back into the secure
+                    // credential store and ui-meta.json.
+                    _vm.ApplySavedLoginPreference(account, loginWindow.SavePasswordRequested, loginWindow.ConsumeEnteredPassword());
+                }
             };
+
+            var forgetPasswordItem = new MenuItem { Header = "Forget Saved Password" };
+            forgetPasswordItem.Click += (_, _) => _vm.ForgetSavedPassword(account);
 
             var deactivateItem = new MenuItem { Header = "Deactivate Authenticator…" };
             deactivateItem.Click += async (_, _) => await _vm.DeactivateAuthenticatorCommand.ExecuteAsync(account);
@@ -89,6 +99,7 @@ namespace SteamDesktopAuthenticator.Views
             menu.Items.Add(renameItem);
             menu.Items.Add(toggleItem);
             menu.Items.Add(reloginItem);
+            if (account.Meta.SaveLoginEnabled) menu.Items.Add(forgetPasswordItem);
             menu.Items.Add(new Separator());
             menu.Items.Add(deactivateItem);
             menu.Items.Add(removeItem);
