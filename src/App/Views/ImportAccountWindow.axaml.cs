@@ -19,8 +19,11 @@ namespace SteamDesktopAuthenticator.Views
         private readonly Manifest _manifest;
 
         /// <summary>Raised on the UI thread whenever an account is successfully linked/imported,
-        /// so MainWindow can add it to the live dashboard without a full reload.</summary>
-        public event Action<SteamGuardAccount>? AccountAdded;
+        /// so MainWindow can add it to the live dashboard without a full reload. The bool/string?
+        /// carry the "Save password for automatic re-login" checkbox state from whatever
+        /// LoginWindow was shown as part of this flow (Task 1) - both are default/null when no
+        /// fresh login happened (e.g. importing a .maFile that already had a valid session).</summary>
+        public event Action<SteamGuardAccount, bool, string?>? AccountAdded;
 
         /// <summary>Design-time/XAML-loader constructor only. Not used at runtime - the app always
         /// constructs this window via the (IDialogService) overload below.</summary>
@@ -47,7 +50,7 @@ namespace SteamDesktopAuthenticator.Views
             var ok = await loginWindow.ShowDialog<bool>(this);
             if (ok && loginWindow.LinkedAccount != null)
             {
-                AccountAdded?.Invoke(loginWindow.LinkedAccount);
+                AccountAdded?.Invoke(loginWindow.LinkedAccount, loginWindow.SavePasswordRequested, loginWindow.ConsumeEnteredPassword());
                 await _dialogService.ShowMessageAsync("Account added to the dashboard.");
             }
         }
@@ -191,6 +194,9 @@ namespace SteamDesktopAuthenticator.Views
                     return (false, "This doesn't look like a valid .maFile.");
                 }
 
+                bool saveLoginRequested = false;
+                string? password = null;
+
                 if (account.Session == null || account.Session.SteamID == 0 || account.Session.IsAccessTokenExpired())
                 {
                     var loginWindow = new LoginWindow(_dialogService, LoginType.Import, account);
@@ -200,6 +206,8 @@ namespace SteamDesktopAuthenticator.Views
                         return (false, "Login failed. Try importing this account again.");
                     }
                     account.Session = loginWindow.Session;
+                    saveLoginRequested = loginWindow.SavePasswordRequested;
+                    password = loginWindow.ConsumeEnteredPassword();
                 }
 
                 // Preserved from original: imported accounts are saved unencrypted into the
@@ -209,7 +217,7 @@ namespace SteamDesktopAuthenticator.Views
                     return (false, "Failed to save the imported account.");
                 }
 
-                AccountAdded?.Invoke(account);
+                AccountAdded?.Invoke(account, saveLoginRequested, password);
                 return (true, null);
             }
             catch (Exception ex)

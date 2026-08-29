@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SteamAuth;
 using SteamDesktopAuthenticator.Core;
+using SteamDesktopAuthenticator.Core.Security;
 using SteamDesktopAuthenticator.Services;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,7 @@ namespace SteamDesktopAuthenticator.ViewModels
         private UiMetaStore? _uiMeta;
         private string? _passKey;
         private readonly ConfirmationPollingService _pollingService;
+        private readonly SessionRecoveryService _recoveryService;
         private System.Threading.Timer? _codeRefreshTimer;
 
         /// <summary>Injected by App startup - lets the ViewModel ask the UI layer to show dialogs
@@ -72,9 +74,20 @@ namespace SteamDesktopAuthenticator.ViewModels
         public MainWindowViewModel(IDialogService dialogService)
         {
             DialogService = dialogService;
-            _pollingService = new ConfirmationPollingService(() => Accounts);
+            _recoveryService = new SessionRecoveryService();
+            _pollingService = new ConfirmationPollingService(() => Accounts, _recoveryService, PersistAccount);
             _pollingService.ConfirmationsUpdated += OnConfirmationsUpdated;
             _pollingService.AccountPollFailed += OnAccountPollFailed;
+        }
+
+        /// <summary>Saves an account's current session/tokens back to its .maFile, using
+        /// whichever manifest/passkey is currently active. Shared by the confirmation polling
+        /// service and the confirm/reject flow so a successful automatic re-login (Task 2) is
+        /// always persisted the same way "Refresh Login…" already persists a manual one.</summary>
+        private bool PersistAccount(SteamGuardAccount account)
+        {
+            if (_manifest == null) return false;
+            return _manifest.SaveAccount(account, _manifest.Encrypted, _passKey);
         }
 
         partial void OnSearchTextChanged(string value)
@@ -267,9 +280,29 @@ namespace SteamDesktopAuthenticator.ViewModels
                     var confs = group.Select(g => g.Confirmation).ToArray();
                     try
                     {
-                        bool ok = accept
-                            ? await group.Key.Account.AcceptMultipleConfirmations(confs)
-                            : await group.Key.Account.DenyMultipleConfirmations(confs);
+                        bool ok;
+                        try
+                        {
+                            ok = accept
+                                ? await group.Key.Account.AcceptMultipleConfirmations(confs)
+                                : await group.Key.Account.DenyMultipleConfirmations(confs);
+                        }
+                        catch (Exception actionEx) when (group.Key.Account.Session.IsAccessTokenExpired())
+                        {
+                            // Session died between the last poll and this click - try to recover
+                            // it (Task 2) and retry the confirm/reject once before giving up.
+                            var outcome = await _recoveryService.EnsureValidSessionAsync(
+                                group.Key.Account, group.Key.Meta.SaveLoginEnabled, () => PersistAccount(group.Key.Account));
+
+                            if (outcome != SessionRecoveryService.RecoveryOutcome.Recovered)
+                            {
+                                throw actionEx;
+                            }
+
+                            ok = accept
+                                ? await group.Key.Account.AcceptMultipleConfirmations(confs)
+                                : await group.Key.Account.DenyMultipleConfirmations(confs);
+                        }
 
                         if (ok)
                         {
@@ -337,6 +370,7 @@ namespace SteamDesktopAuthenticator.ViewModels
 
             if (_manifest.RemoveAccount(account.Account))
             {
+                DeleteSavedPasswordSafely(account.Account.Session.SteamID);
                 _uiMeta?.Remove(account.Account.Session.SteamID);
                 _uiMeta?.Save();
                 Accounts.Remove(account);
@@ -475,6 +509,7 @@ namespace SteamDesktopAuthenticator.ViewModels
 
             if (_manifest.RemoveAccount(account.Account))
             {
+                DeleteSavedPasswordSafely(account.Account.Session.SteamID);
                 _uiMeta?.Remove(account.Account.Session.SteamID);
                 _uiMeta?.Save();
                 Accounts.Remove(account);
@@ -557,8 +592,10 @@ namespace SteamDesktopAuthenticator.ViewModels
         }
 
         /// <summary>Adds a freshly-imported/logged-in account (from the Import/Login flow) to the
-        /// live dashboard without requiring a full manifest reload.</summary>
-        public void AddImportedAccount(SteamGuardAccount account)
+        /// live dashboard without requiring a full manifest reload. saveLoginRequested/password
+        /// come straight from LoginWindow.SavePasswordRequested/ConsumeEnteredPassword() - see
+        /// ApplySavedLoginPreference for what happens with them (Task 1).</summary>
+        public void AddImportedAccount(SteamGuardAccount account, bool saveLoginRequested = false, string? password = null)
         {
             if (_uiMeta == null) _uiMeta = UiMetaStore.Load();
             var meta = _uiMeta.GetOrCreate(account.Session.SteamID);
@@ -567,6 +604,82 @@ namespace SteamDesktopAuthenticator.ViewModels
             Accounts.Add(vm);
             OnPropertyChanged(nameof(FilteredAccounts));
             RebuildDisplayedAccounts();
+
+            ApplySavedLoginPreference(vm, saveLoginRequested, password);
+        }
+
+        /// <summary>Single place where the "Save password for automatic re-login" checkbox
+        /// (Task 1) is actually acted on: writes/clears the password in the OS-native secure
+        /// credential store and keeps AccountMeta.SaveLoginEnabled (the non-sensitive on/off
+        /// flag persisted in ui-meta.json) in sync with it. Called after every login flow that
+        /// shows LoginWindow - Refresh Login, Import, and the Initial/new-authenticator flow.</summary>
+        public void ApplySavedLoginPreference(AccountViewModel account, bool enabled, string? password)
+        {
+            ulong steamId = account.Account.Session.SteamID;
+            string accountKey = steamId.ToString();
+            var store = CredentialStoreFactory.Get();
+
+            try
+            {
+                if (enabled && !string.IsNullOrEmpty(password))
+                {
+                    if (!store.IsSupported)
+                    {
+                        StatusMessage = $"Could not save password: no secure credential store ({store.DisplayName}) is available on this system.";
+                        Logger.Warn("Auth", $"{Logger.AccountRef(steamId)} save-password requested but {store.DisplayName} is unavailable - not saved.");
+                        account.Meta.SaveLoginEnabled = false;
+                    }
+                    else
+                    {
+                        store.SavePassword(accountKey, account.Account.AccountName, password);
+                        account.Meta.SaveLoginEnabled = true;
+                        _recoveryService.ResetFailureState(steamId);
+                        Logger.Info("Auth", $"{Logger.AccountRef(steamId)} password saved to {store.DisplayName} for automatic re-login.");
+                    }
+                }
+                else if (account.Meta.SaveLoginEnabled)
+                {
+                    // Checkbox was unchecked (or this login didn't touch the preference at all
+                    // but a password was previously saved and is now being explicitly turned
+                    // off) - Task 1: "If disabled: Do not persist the password."
+                    if (store.IsSupported) store.DeletePassword(accountKey);
+                    account.Meta.SaveLoginEnabled = false;
+                    Logger.Info("Auth", $"{Logger.AccountRef(steamId)} saved password removed.");
+                }
+            }
+            catch (CredentialStoreException ex)
+            {
+                StatusMessage = $"Could not update the saved password: {ex.Message}";
+                Logger.Error("Auth", $"{Logger.AccountRef(steamId)} credential store operation failed: {ex.Message}");
+            }
+            finally
+            {
+                password = null; // do not keep the plaintext around any longer than this call
+                _uiMeta?.Save();
+            }
+        }
+
+        /// <summary>Explicit "forget saved password" action, used by the account context menu -
+        /// same effect as unchecking the box and logging in again, without requiring a login.</summary>
+        public void ForgetSavedPassword(AccountViewModel? account)
+        {
+            if (account == null || !account.Meta.SaveLoginEnabled) return;
+            ApplySavedLoginPreference(account, enabled: false, password: null);
+        }
+
+        /// <summary>Best-effort credential cleanup when an account is removed/deactivated, so a
+        /// saved password never outlives the account it belongs to.</summary>
+        private static void DeleteSavedPasswordSafely(ulong steamId)
+        {
+            try
+            {
+                var store = CredentialStoreFactory.Get();
+                if (store.IsSupported) store.DeletePassword(steamId.ToString());
+            }
+            catch (CredentialStoreException ex)
+            {
+                Logger.Warn("Auth", $"{Logger.AccountRef(steamId)} failed to remove saved password during account removal: {ex.Message}");
+            }
         }
 
         public void Shutdown()

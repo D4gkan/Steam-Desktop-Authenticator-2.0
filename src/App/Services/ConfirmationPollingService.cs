@@ -1,4 +1,5 @@
 using SteamAuth;
+using SteamDesktopAuthenticator.Core;
 using SteamDesktopAuthenticator.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,11 @@ namespace SteamDesktopAuthenticator.Services
     /// Polls FetchConfirmationsAsync for every enabled account on an interval and reports back
     /// the merged set. One failing/expired account (e.g. session needs re-login) does not block
     /// confirmations from other accounts from showing - each account is fetched independently.
+    ///
+    /// On a failure that looks like an expired session, this now asks the shared
+    /// <see cref="SessionRecoveryService"/> to refresh/re-authenticate the account (Task 2) and,
+    /// if that succeeds, retries the fetch once for that account before giving up - all within
+    /// the same poll cycle, so a routine token refresh never even surfaces as a visible failure.
     /// </summary>
     public class ConfirmationPollingService : IDisposable
     {
@@ -20,12 +26,19 @@ namespace SteamDesktopAuthenticator.Services
         public event Action<AccountViewModel, Exception>? AccountPollFailed;
 
         private readonly Func<IEnumerable<AccountViewModel>> _accountsProvider;
+        private readonly SessionRecoveryService _recoveryService;
+        private readonly Func<SteamGuardAccount, bool> _persistAccount;
         private Timer? _timer;
         private int _isPolling; // 0/1 guard against overlapping poll cycles
 
-        public ConfirmationPollingService(Func<IEnumerable<AccountViewModel>> accountsProvider)
+        public ConfirmationPollingService(
+            Func<IEnumerable<AccountViewModel>> accountsProvider,
+            SessionRecoveryService recoveryService,
+            Func<SteamGuardAccount, bool> persistAccount)
         {
             _accountsProvider = accountsProvider;
+            _recoveryService = recoveryService;
+            _persistAccount = persistAccount;
         }
 
         public void Start(TimeSpan interval)
@@ -52,7 +65,27 @@ namespace SteamDesktopAuthenticator.Services
                 {
                     try
                     {
-                        var confs = await acc.Account.FetchConfirmationsAsync();
+                        Confirmation[]? confs;
+                        try
+                        {
+                            confs = await acc.Account.FetchConfirmationsAsync();
+                        }
+                        catch (Exception fetchEx) when (LooksLikeExpiredSession(fetchEx))
+                        {
+                            Logger.Info("Confirmations", $"{Logger.AccountRef(acc.Account.Session.SteamID)} fetch failed ({fetchEx.Message}) - attempting session recovery.");
+                            var outcome = await _recoveryService.EnsureValidSessionAsync(
+                                acc.Account, acc.Meta.SaveLoginEnabled, () => _persistAccount(acc.Account));
+
+                            if (outcome != SessionRecoveryService.RecoveryOutcome.Recovered)
+                            {
+                                throw; // rethrow original exception - handled by the outer catch below
+                            }
+
+                            // Retry the original request now that the session should be valid
+                            // again (Task 2: "retry the original request").
+                            confs = await acc.Account.FetchConfirmationsAsync();
+                        }
+
                         int count = confs?.Length ?? 0;
                         Dispatcher.UIThread.Post(() => acc.PendingConfirmationCount = count);
                         if (confs != null)
@@ -78,6 +111,18 @@ namespace SteamDesktopAuthenticator.Services
                 Interlocked.Exchange(ref _isPolling, 0);
             }
         }
+
+        /// <summary>SteamAuth's FetchConfirmationInternal throws a plain Exception (not a typed
+        /// one) for both "needauth" and any non-success response from Steam - so message
+        /// matching is the only signal available without changing SteamAuth's public exception
+        /// shape. Kept narrow (only the two known "your session is bad" messages) so unrelated
+        /// failures - bad device id, network errors, Steam outages - are surfaced normally
+        /// instead of triggering an unnecessary re-login attempt.</summary>
+        private static bool LooksLikeExpiredSession(Exception ex) =>
+            ex.Message != null &&
+            (ex.Message.Contains("Needs Authentication", StringComparison.OrdinalIgnoreCase) ||
+             ex.Message.Contains("Invalid Access Token", StringComparison.OrdinalIgnoreCase) ||
+             ex.Message.Contains("access_token", StringComparison.OrdinalIgnoreCase));
 
         public void Dispose() => Stop();
     }

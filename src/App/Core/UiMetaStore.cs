@@ -22,6 +22,14 @@ namespace SteamDesktopAuthenticator.Core
 
         [JsonProperty("enabled")]
         public bool Enabled { get; set; } = true;
+
+        /// <summary>Whether this account's Steam password is saved in the OS-native secure
+        /// credential store for automatic re-login when the session expires. The password
+        /// itself is never stored here - this is only a non-sensitive on/off flag; the actual
+        /// secret lives in Windows Credential Manager / macOS Keychain / the Linux Secret
+        /// Service, keyed by this account's Steam ID. Defaults to false (opt-in, per Task 1).</summary>
+        [JsonProperty("save_login_enabled")]
+        public bool SaveLoginEnabled { get; set; } = false;
     }
 
     public class UiMetaStore

@@ -142,6 +142,8 @@
                         </StackPanel>
                         <TextBlock Text="{Binding Headline}" FontWeight="SemiBold" TextWrapping="Wrap"/>
                         <TextBlock Text="{Binding Summary}" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding Summary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        <TextBlock Text="Steam sent a confirmation type this version of SDA doesn't have dedicated handling for yet. Review it carefully before confirming."
+                                   Classes="muted" TextWrapping="Wrap" FontStyle="Italic" IsVisible="{Binding IsUnrecognizedType}"/>
                       </StackPanel>
                       <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <Button Classes="danger" Content="Reject"

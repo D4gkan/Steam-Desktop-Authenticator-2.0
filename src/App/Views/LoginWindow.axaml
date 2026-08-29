@@ -19,6 +19,12 @@
         <TextBox x:Name="PasswordBox" PasswordChar="•"/>
       </StackPanel>
 
+      <StackPanel Spacing="2">
+        <CheckBox x:Name="SavePasswordCheckBox" Content="Save password for automatic re-login"/>
+        <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Margin="26,0,0,0"
+                   Text="Stored in this system's secure credential store (Windows Credential Manager, macOS Keychain, or the Linux Secret Service) - not in a plain file. Used only to sign back in automatically when your session expires."/>
+      </StackPanel>
+
       <TextBlock x:Name="StatusText" Classes="muted" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" IsVisible="False"/>
 
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
