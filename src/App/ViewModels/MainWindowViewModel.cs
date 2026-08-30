@@ -625,7 +625,8 @@ namespace SteamDesktopAuthenticator.ViewModels
                 {
                     if (!store.IsSupported)
                     {
-                        StatusMessage = $"Could not save password: no secure credential store ({store.DisplayName}) is available on this system.";
+                        string hint = string.IsNullOrEmpty(store.UnavailableHint) ? "" : $" {store.UnavailableHint}";
+                        StatusMessage = $"Could not save password: no secure credential store ({store.DisplayName}) is available on this system.{hint}";
                         Logger.Warn("Auth", $"{Logger.AccountRef(steamId)} save-password requested but {store.DisplayName} is unavailable - not saved.");
                         account.Meta.SaveLoginEnabled = false;
                     }

@@ -38,6 +38,12 @@ namespace SteamDesktopAuthenticator.Core.Security
 
         public string DisplayName => "Secret Service (libsecret / secret-tool)";
 
+        public string UnavailableHint =>
+            "Install libsecret-tools (Debian/Ubuntu: sudo apt install libsecret-tools; " +
+            "Fedora: sudo dnf install libsecret gnome-keyring; " +
+            "Arch: sudo pacman -S libsecret gnome-keyring) and make sure a keyring service " +
+            "(e.g. gnome-keyring) is running, then restart the app.";
+
         private static bool ProbeSecretTool()
         {
             try

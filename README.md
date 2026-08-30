@@ -96,6 +96,24 @@ This build is written on **Avalonia UI**, a cross-platform .NET framework, rathe
 - **Windows 10+** — fully supported.
 - **Linux x64** — a build is published in the release, but functional testing hasn't been confirmed yet. If you try it, please open an issue and let us know whether it launches and works correctly on your distro so this can be marked as verified.
 
+**Saving passwords for automatic re-login on Linux** requires `libsecret-tools` (provides `secret-tool`) plus a running Secret Service provider (e.g. `gnome-keyring`). Without them the "save password" checkbox will fail with *"no secure credential store available"* and no password will be saved.
+
+Install commands:
+
+| Distro | Command |
+|---|---|
+| Debian/Ubuntu/Mint | `sudo apt install libsecret-tools gnome-keyring` |
+| Fedora | `sudo dnf install libsecret gnome-keyring` |
+| Arch | `sudo pacman -S libsecret gnome-keyring` |
+
+> **Note:** on minimal/non-GNOME setups (i3, barebones window managers, etc.), `gnome-keyring-daemon` may not auto-start with the session and needs to be started/unlocked manually — see your WM's documentation or `gnome-keyring`'s PAM integration. You can verify the Secret Service is reachable with:
+> ```
+> echo -n "test" | secret-tool store --label=test service test account test && secret-tool lookup service test account test
+> ```
+> If that round-trips your test value back out, `secret-tool`/the keyring are working correctly.
+>
+> `secret-tool` availability is checked once per app run and cached for the life of the process — if you install `libsecret-tools` (or start the keyring) while SDA is already open, it won't be picked up until you fully restart the app.
+
 To build it yourself on Linux:
 
 ```
@@ -258,6 +276,7 @@ This mirrors the safety flow of Steam's own authenticator removal, so you can't 
 **Automatic re-login fails**
 1. Make sure the account is configured to **save its password for automatic re-login** in the OS credential store.
 2. If Steam requires a fresh verification code or a new login challenge, re-authentication may still need direct user action.
+3. **On Linux**, if saving the password fails with *"no secure credential store available"*, you're missing `secret-tool`/a running keyring service — see [Saving passwords for automatic re-login on Linux](#-platform-support) above for install commands. If you just installed it, fully restart SDA — the check only runs once per app launch and won't detect it while the app is still open.
 
 If your issue isn't listed here or nothing above fixes it, please open an issue on the issue tracker. When sharing logs, upload them to a paste service like [Pastebin](http://www.pastebin.com) rather than pasting large blocks directly into the issue.
 

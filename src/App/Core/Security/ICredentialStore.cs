@@ -25,6 +25,13 @@ namespace SteamDesktopAuthenticator.Core.Security
         /// Never includes any secret material.</summary>
         string DisplayName { get; }
 
+        /// <summary>Optional, human-readable remediation text to append to the "could not save
+        /// password" status/error message when <see cref="IsSupported"/> is false - e.g. what
+        /// package to install and/or what service needs to be running. Empty string if there is
+        /// nothing actionable to tell the user (e.g. platforms where the store is always
+        /// available). Never includes any secret material.</summary>
+        string UnavailableHint => string.Empty;
+
         /// <summary>Saves (or overwrites) the password for the given account key. Throws
         /// <see cref="CredentialStoreException"/> on failure.</summary>
         void SavePassword(string accountKey, string username, string password);
