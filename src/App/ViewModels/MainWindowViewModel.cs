@@ -1,9 +1,14 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SteamAuth;
 using SteamDesktopAuthenticator.Core;
 using SteamDesktopAuthenticator.Core.Security;
 using SteamDesktopAuthenticator.Services;
+using SteamDesktopAuthenticator.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -65,6 +70,7 @@ namespace SteamDesktopAuthenticator.ViewModels
         private string? _passKey;
         private readonly ConfirmationPollingService _pollingService;
         private readonly SessionRecoveryService _recoveryService;
+        private readonly HashSet<ulong> _sessionExpiredPromptSet = new();
         private System.Threading.Timer? _codeRefreshTimer;
 
         /// <summary>Injected by App startup - lets the ViewModel ask the UI layer to show dialogs
@@ -222,10 +228,47 @@ namespace SteamDesktopAuthenticator.ViewModels
 
         private void OnAccountPollFailed(AccountViewModel account, Exception ex)
         {
-            // A WGTokenExpiredException-style failure usually means the session needs a fresh
-            // login. We surface this passively (icon/status) rather than popping a dialog per
-            // poll cycle, matching the original's non-intrusive tray-only status.
             StatusMessage = $"{account.DisplayName}: session may need to be refreshed ({ex.Message})";
+
+            if (account.Account.Session.IsAccessTokenExpired() || account.Account.Session.IsRefreshTokenExpired())
+            {
+                Dispatcher.UIThread.Post(async () => await PromptRefreshLoginIfNeededAsync(account));
+            }
+        }
+
+        private async Task PromptRefreshLoginIfNeededAsync(AccountViewModel account)
+        {
+            var steamId = account.Account.Session.SteamID;
+            if (!_sessionExpiredPromptSet.Add(steamId)) return;
+
+            try
+            {
+                var owner = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                    ? desktop.MainWindow
+                    : null;
+
+                if (owner == null)
+                {
+                    StatusMessage = $"{account.DisplayName}: session expired. Please refresh your login.";
+                    return;
+                }
+
+                var loginWindow = new LoginWindow(DialogService, LoginType.Refresh, account.Account, account.Meta.SaveLoginEnabled);
+                var ok = await loginWindow.ShowDialog<bool>(owner);
+                if (ok)
+                {
+                    ApplySavedLoginPreference(account, loginWindow.SavePasswordRequested, loginWindow.ConsumeEnteredPassword());
+                    StatusMessage = $"{account.DisplayName}: login refreshed.";
+                }
+                else
+                {
+                    StatusMessage = $"{account.DisplayName}: session expired. Please refresh your login.";
+                }
+            }
+            finally
+            {
+                _sessionExpiredPromptSet.Remove(steamId);
+            }
         }
 
         [RelayCommand]
@@ -287,7 +330,7 @@ namespace SteamDesktopAuthenticator.ViewModels
                                 ? await group.Key.Account.AcceptMultipleConfirmations(confs)
                                 : await group.Key.Account.DenyMultipleConfirmations(confs);
                         }
-                        catch (Exception actionEx) when (group.Key.Account.Session.IsAccessTokenExpired())
+                        catch (Exception) when (group.Key.Account.Session.IsAccessTokenExpired())
                         {
                             // Session died between the last poll and this click - try to recover
                             // it (Task 2) and retry the confirm/reject once before giving up.
@@ -296,7 +339,7 @@ namespace SteamDesktopAuthenticator.ViewModels
 
                             if (outcome != SessionRecoveryService.RecoveryOutcome.Recovered)
                             {
-                                throw actionEx;
+                                throw;
                             }
 
                             ok = accept
@@ -321,6 +364,11 @@ namespace SteamDesktopAuthenticator.ViewModels
                     catch (Exception ex)
                     {
                         StatusMessage = $"{group.Key.DisplayName}: {ex.Message}";
+
+                        if (group.Key.Account.Session.IsAccessTokenExpired() || group.Key.Account.Session.IsRefreshTokenExpired())
+                        {
+                            await PromptRefreshLoginIfNeededAsync(group.Key);
+                        }
                     }
                 }
             }
@@ -616,7 +664,6 @@ namespace SteamDesktopAuthenticator.ViewModels
         public void ApplySavedLoginPreference(AccountViewModel account, bool enabled, string? password)
         {
             ulong steamId = account.Account.Session.SteamID;
-            string accountKey = steamId.ToString();
             var store = CredentialStoreFactory.Get();
 
             try
@@ -632,7 +679,7 @@ namespace SteamDesktopAuthenticator.ViewModels
                     }
                     else
                     {
-                        store.SavePassword(accountKey, account.Account.AccountName, password);
+                        CredentialStoreCompat.SavePassword(store, steamId, account.Account.AccountName, password);
                         account.Meta.SaveLoginEnabled = true;
                         _recoveryService.ResetFailureState(steamId);
                         Logger.Info("Auth", $"{Logger.AccountRef(steamId)} password saved to {store.DisplayName} for automatic re-login.");
@@ -643,7 +690,7 @@ namespace SteamDesktopAuthenticator.ViewModels
                     // Checkbox was unchecked (or this login didn't touch the preference at all
                     // but a password was previously saved and is now being explicitly turned
                     // off) - Task 1: "If disabled: Do not persist the password."
-                    if (store.IsSupported) store.DeletePassword(accountKey);
+                    if (store.IsSupported) CredentialStoreCompat.DeletePassword(store, steamId, account.Account.AccountName);
                     account.Meta.SaveLoginEnabled = false;
                     Logger.Info("Auth", $"{Logger.AccountRef(steamId)} saved password removed.");
                 }
@@ -675,7 +722,11 @@ namespace SteamDesktopAuthenticator.ViewModels
             try
             {
                 var store = CredentialStoreFactory.Get();
-                if (store.IsSupported) store.DeletePassword(steamId.ToString());
+                if (store.IsSupported)
+                {
+                    var accountKey = steamId.ToString();
+                    CredentialStoreCompat.DeletePassword(store, steamId, accountKey);
+                }
             }
             catch (CredentialStoreException ex)
             {

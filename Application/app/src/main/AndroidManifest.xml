@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <application
+        android:name=".SdaApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/icon"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SdaMobile">
+
+        <!--
+          allowBackup / dataExtractionRules are both locked down: this app's private storage
+          holds encrypted (or, if the user opted out, plaintext) Steam account secrets, and
+          those must never end up in an Android/cloud backup outside the user's explicit
+          control - same "never write secrets anywhere but the OS-native secure store or the
+          user-controlled maFiles" principle as the desktop app's FileEncryptor/CredentialStore.
+        -->
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.SdaMobile">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- No need to declare com.journeyapps.barcodescanner.CaptureActivity here - the
+             zxing-android-embedded library's own manifest registers it, and Gradle's manifest
+             merger pulls it in automatically. -->
+
+    </application>
+</manifest>

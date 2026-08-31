@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simple placeholder mark (a stylized shield/lock). Replace with real app artwork -
+     see README "Branding" note. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#66C0F4"
+        android:pathData="M54,24 L78,34 V54 C78,70 68,80 54,86 C40,80 30,70 30,54 V34 Z" />
+    <path
+        android:fillColor="#0E1116"
+        android:pathData="M54,50 m-9,0 a9,9 0,1 1,18 0 a9,9 0,1 1,-18 0 M50,59 h8 v14 h-8 Z" />
+</vector>
