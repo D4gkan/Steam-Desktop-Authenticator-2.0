@@ -1,0 +1,40 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build output / generated files
+**/bin/
+**/obj/
+**/build/
+**/out/
+**/.gradle/
+**/.kotlin/
+**/.idea/
+**/*.iml
+**/local.properties
+
+# Android project noise
+Application/.gradle/
+Application/.kotlin/
+Application/**/build/
+Application/**/captures/
+Application/**/.cxx/
+Application/**/*.iml
+Application/local.properties
+
+# Logs / temp files
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Archive artifacts
+*.zip
+*.apk
+*.aab

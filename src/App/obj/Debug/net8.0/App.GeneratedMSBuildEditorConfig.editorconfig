@@ -18,32 +18,32 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = SteamDesktopAuthenticator
-build_property.ProjectDir = C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0-main\src\App\
+build_property.ProjectDir = C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\App\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/App.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Styles/Theme.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Styles/Theme.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Views/ImportAccountWindow.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Views/ImportAccountWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Views/LoginWindow.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Views/LoginWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Views/MainWindow.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Views/PhoneInputWindow.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Views/PhoneInputWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Views/PromptDialog.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Views/PromptDialog.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0-main/src/App/Views/SettingsWindow.axaml]
+[C:/Users/dagka/Desktop/Steam-Desktop-Authenticator-2.0/src/App/Views/SettingsWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

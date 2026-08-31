@@ -10,3 +10,16 @@ C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0-main\src\SteamAuth\obj\De
 C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0-main\src\SteamAuth\obj\Debug\net8.0\refint\SteamAuth.dll
 C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0-main\src\SteamAuth\obj\Debug\net8.0\SteamAuth.pdb
 C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0-main\src\SteamAuth\obj\Debug\net8.0\ref\SteamAuth.dll
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\bin\Debug\net8.0\SteamAuth.deps.json
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\bin\Debug\net8.0\SteamAuth.dll
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\bin\Debug\net8.0\SteamAuth.pdb
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.csproj.AssemblyReference.cache
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.AssemblyInfoInputs.cache
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.AssemblyInfo.cs
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.csproj.CoreCompileInputs.cache
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.sourcelink.json
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.dll
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\refint\SteamAuth.dll
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\SteamAuth.pdb
+C:\Users\dagka\Desktop\Steam-Desktop-Authenticator-2.0\src\SteamAuth\obj\Debug\net8.0\ref\SteamAuth.dll

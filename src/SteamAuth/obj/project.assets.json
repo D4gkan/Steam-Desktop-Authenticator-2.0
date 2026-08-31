@@ -60,11 +60,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\SteamAuth\\SteamAuth.csproj",
+      "projectUniqueName": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\SteamAuth\\SteamAuth.csproj",
       "projectName": "SteamAuth",
-      "projectPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\SteamAuth\\SteamAuth.csproj",
+      "projectPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\SteamAuth\\SteamAuth.csproj",
       "packagesPath": "C:\\Users\\dagka\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\SteamAuth\\obj\\",
+      "outputPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\SteamAuth\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dagka\\AppData\\Roaming\\NuGet\\NuGet.Config"

@@ -130,7 +130,8 @@ namespace SteamDesktopAuthenticator.Services
                 string? password;
                 try
                 {
-                    password = CredentialStoreFactory.Get().TryGetPassword(steamId.ToString());
+                    var store = CredentialStoreFactory.Get();
+                    password = CredentialStoreCompat.TryGetPassword(store, steamId, account.AccountName);
                 }
                 catch (CredentialStoreException ex)
                 {

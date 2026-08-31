@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "N8m8hB+EyA0=",
+  "dgSpecHash": "N6ooRnNRtLQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\App\\App.csproj",
+  "projectFilePath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\App\\App.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dagka\\.nuget\\packages\\avalonia\\11.1.3\\avalonia.11.1.3.nupkg.sha512",
     "C:\\Users\\dagka\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.22045.20230930\\avalonia.angle.windows.natives.2.1.22045.20230930.nupkg.sha512",

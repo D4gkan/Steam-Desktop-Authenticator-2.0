@@ -8,8 +8,8 @@
 
 <sub><b>We are not affiliated with Steam or Scrap.TF in any way!</b> This project is run by community volunteers.</sub>
 
-[![Latest Release](https://img.shields.io/badge/version-2.0.1-3fb950?style=for-the-badge)](#-download--install)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20(beta)-0078D6?style=for-the-badge&logo=linux)](#-download--install)
+[![Latest Release](https://img.shields.io/badge/version-2.0.2-3fb950?style=for-the-badge)](#-download--install)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20·%20Android-0078D6?style=for-the-badge&logo=linux)](#-download--install)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 </div>
@@ -64,6 +64,16 @@ It's aimed at people who manage several Steam accounts (traders, bot operators, 
 
 ---
 
+## 🗂️ Repository layout
+
+This repository contains the Windows/Linux desktop app and a supported Android companion app:
+
+- `src/` — the main desktop client built with Avalonia and .NET for Windows and Linux.
+- `Application/` — the Android app built with Kotlin and Jetpack Compose.
+- `SteamDesktopAuthenticator.sln` — the Visual Studio solution for the desktop project.
+
+The Android app is a first-class companion to the desktop project: it uses the same `.maFile` and `manifest.json` conventions and is intended to work with the same account workflows. See [Application/README.md](Application/README.md) for its setup and build notes.
+
 ## ✨ Feature overview
 
 | Feature | Description |
@@ -91,10 +101,11 @@ It's aimed at people who manage several Steam accounts (traders, bot operators, 
 
 ## 🐧 Platform support
 
-This build is written on **Avalonia UI**, a cross-platform .NET framework, rather than the original WinForms codebase — so unlike classic SDA, it isn't tied to Windows.
+This project is built on **Avalonia UI**, a cross-platform .NET framework, so the desktop app is not limited to Windows.
 
 - **Windows 10+** — fully supported.
-- **Linux x64** — a build is published in the release, but functional testing hasn't been confirmed yet. If you try it, please open an issue and let us know whether it launches and works correctly on your distro so this can be marked as verified.
+- **Linux x64** — fully supported for desktop use and included in the release builds.
+- **Android** — supported as a companion app for mobile access and account management, using the same account file formats and authenticator workflows.
 
 **Saving passwords for automatic re-login on Linux** requires `libsecret-tools` (provides `secret-tool`) plus a running Secret Service provider (e.g. `gnome-keyring`). Without them the "save password" checkbox will fail with *"no secure credential store available"* and no password will be saved.
 
@@ -130,12 +141,18 @@ dotnet publish src/App/App.csproj -c Release -r linux-x64 --self-contained -p:Pu
 
 > **Note:** if you install the .NET SDK on Linux, use [Microsoft's official install script](https://dot.net/v1/dotnet-install.sh) rather than your distro's package manager where possible — some distro packages (including on Mint/Ubuntu-based systems) ship incomplete `dotnet` builds that fail with a `libhostfxr.so not found` error.
 
+## 📱 Android companion app
+
+The repository also includes an Android companion app in [Application/README.md](Application/README.md). It is a Kotlin + Jetpack Compose implementation that mirrors the desktop app's authenticator logic and can read/write the same `.maFile` and `manifest.json` formats.
+
+Android is a supported companion platform for this project and is intended for mobile access alongside the desktop app. It is not a replacement for the official Steam Mobile app, but it is a supported, maintained part of the SDA ecosystem.
+
 ## 📦 Download & Install
 
 ### 🪟 Windows
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.1/SteamDesktopAuthenticator-v2.0.1-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.1-win-x64.zip</code></a>.</td></tr>
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.2/SteamDesktopAuthenticator-v2.0.2-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.2-win-x64.zip</code></a>.</td></tr>
 <tr><td>2️⃣</td><td>Right-click the downloaded zip and choose <b>Extract All…</b> (or use 7-Zip/WinRAR) to a <b>safe, permanent folder</b> — e.g. <code>C:\SDA</code>. Don't run it from inside your Downloads or a temp folder, since losing this folder later can mean losing access to your Steam account(s).</td></tr>
 <tr><td>3️⃣</td><td>Open the extracted folder and double-click <b>SteamDesktopAuthenticator.exe</b> to launch the app.</td></tr>
 <tr><td>4️⃣</td><td>If Windows SmartScreen shows a warning (common for apps without a paid code-signing certificate), click <b>More info → Run anyway</b>.</td></tr>
@@ -146,14 +163,14 @@ No separate .NET install is required — the Windows build is self-contained.
 ### 🐧 Linux
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.1/SteamDesktopAuthenticator-v2.0.1-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.1-linux-x64.zip</code></a>.</td></tr>
-<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.1-linux-x64.zip -d ~/SDA
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.2/SteamDesktopAuthenticator-v2.0.2-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.2-linux-x64.zip</code></a>.</td></tr>
+<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.2-linux-x64.zip -d ~/SDA
 cd ~/SDA</pre></td></tr>
 <tr><td>3️⃣</td><td>Make the binary executable (only needs to be done once):<br><pre>chmod +x SteamDesktopAuthenticator</pre></td></tr>
 <tr><td>4️⃣</td><td>Launch it:<br><pre>./SteamDesktopAuthenticator</pre>Or double-click it from your file manager if it's set to allow executing files.</td></tr>
 </table>
 
-> **Linux status:** this build is published but hasn't been fully verified across distros yet — see [Platform support](#-platform-support) above. If it doesn't launch, check the [Troubleshooting](#-troubleshooting) section below.
+> **Linux status:** Linux is supported and included in the official release builds. If the app does not launch on your distro, check the [Troubleshooting](#-troubleshooting) section below and open an issue with your distro details.
 
 ### Both platforms
 
@@ -171,7 +188,7 @@ Wherever you extract the app, make sure it's somewhere you'll **remember and bac
 <tr><td>3️⃣</td><td>Enter the verification code Steam sends you to confirm the login.</td></tr>
 <tr><td>4️⃣</td><td>SDA generates and links a new mobile authenticator to your account, the same as the official app would.</td></tr>
 <tr><td>5️⃣</td><td><b>Write down your revocation code</b> when it's shown. This is your emergency key if you ever lose your files — store it somewhere safe and offline.</td></tr>
-<tr><td>6️⃣</td><td>You'll be asked whether to set up encryption for your local files. This is optional but <b>highly recommended</b>. On v2.0.1+, you can also choose to save the password in your OS secure credential store so SDA can attempt automatic recovery after a session expires.</td></tr>
+<tr><td>6️⃣</td><td>You'll be asked whether to set up encryption for your local files. This is optional but <b>highly recommended</b>. On v2.0.2+, you can also choose to save the password in your OS secure credential store so SDA can attempt automatic recovery after a session expires.</td></tr>
 <tr><td>7️⃣</td><td>Get your <b>Steam Guard backup codes</b> at <a href="https://store.steampowered.com/twofactor/manage">store.steampowered.com/twofactor/manage</a> → "Get Backup Codes" — print or save them somewhere safe.</td></tr>
 </table>
 
@@ -201,7 +218,7 @@ The right panel shows all **pending confirmations** — trades and market listin
 - Approve or deny a single item directly on its card.
 - Use **Confirm All** or **Reject All** to process every pending confirmation at once.
 - Enable **"Periodically check for confirmations"** in Settings so this list updates automatically in the background — either for the selected account only, or across all accounts.
-- v2.0.1 also includes safety handling for previously unsupported or unknown confirmation types so one uncommon Steam response doesn't break the entire queue for that account.
+- v2.0.2 also includes safety handling for previously unsupported or unknown confirmation types so one uncommon Steam response doesn't break the entire queue for that account.
 
 ### Adding another account
 
@@ -271,7 +288,7 @@ This mirrors the safety flow of Steam's own authenticator removal, so you can't 
 **Trade confirmation list is blank or just white**
 1. Open the **Selected Account** menu and click **Force session refresh**.
 2. If that doesn't help, open the **Selected Account** menu again and click **Login again**, then sign back in to your Steam account.
-3. If Steam is returning a previously unseen confirmation type, v2.0.1 includes safer handling so that one unknown type no longer kills the rest of the confirmation list for that account.
+3. If Steam is returning a previously unseen confirmation type, v2.0.2 includes safer handling so that one unknown type no longer kills the rest of the confirmation list for that account.
 
 **Automatic re-login fails**
 1. Make sure the account is configured to **save its password for automatic re-login** in the OS credential store.

@@ -2024,11 +2024,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\App\\App.csproj",
+      "projectUniqueName": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\App\\App.csproj",
       "projectName": "SteamDesktopAuthenticator",
-      "projectPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\App\\App.csproj",
+      "projectPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\App\\App.csproj",
       "packagesPath": "C:\\Users\\dagka\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\App\\obj\\",
+      "outputPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\App\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dagka\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2043,8 +2043,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\SteamAuth\\SteamAuth.csproj": {
-              "projectPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0-main\\src\\SteamAuth\\SteamAuth.csproj"
+            "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\SteamAuth\\SteamAuth.csproj": {
+              "projectPath": "C:\\Users\\dagka\\Desktop\\Steam-Desktop-Authenticator-2.0\\src\\SteamAuth\\SteamAuth.csproj"
             }
           }
         }

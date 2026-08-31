@@ -1,2 +1,18 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Keep source files in LF form in the repo to avoid Windows CRLF churn.
+* text=auto eol=lf
+
+# Keep Windows shell scripts as CRLF when checked out on Windows.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.dll binary
+*.exe binary
+*.so binary
+*.dylib binary

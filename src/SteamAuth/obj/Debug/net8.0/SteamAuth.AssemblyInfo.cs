@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright ©  2015")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d53e919456577f9f4ca4bfd5e17786b8bf58155c")]
 [assembly: System.Reflection.AssemblyProductAttribute("SteamAuth")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SteamAuth")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
