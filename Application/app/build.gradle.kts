@@ -9,6 +9,15 @@ android {
     namespace = "com.sda.mobile"
     compileSdk = 35
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../sda-release-key.jks")
+            storePassword = "sda2026!"
+            keyAlias = "sda-release"
+            keyPassword = "sda2026!"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.sda.mobile"
         minSdk = 26
@@ -20,6 +29,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
@@ -76,6 +86,8 @@ dependencies {
     //     automatic-relogin feature, equivalent to Windows Credential Manager / macOS
     //     Keychain / Linux Secret Service on desktop ---
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // Required by com.google.crypto.tink at release/minified build time.
+    implementation("com.google.errorprone:error_prone_annotations:2.36.0")
 
     // --- Biometric unlock for the local encryption passkey ---
     implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
