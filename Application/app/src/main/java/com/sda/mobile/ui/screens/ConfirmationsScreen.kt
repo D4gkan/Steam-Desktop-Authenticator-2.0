@@ -90,14 +90,24 @@ fun ConfirmationsScreen(
                     Spacer(Modifier.height(12.dp))
                     OutlinedButton(onClick = { refreshConfirmations() }) { Text("Check again") }
                 }
-                else -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(state.rows, key = { it.confirmation.id }) { row ->
-                        ConfirmationCard(
-                            row = row,
-                            busy = row.confirmation.id in state.pendingIds,
-                            onAccept = { viewModel.answer(row, allow = true) {} },
-                            onDeny = { viewModel.answer(row, allow = false) {} }
+                else -> Column(Modifier.fillMaxSize()) {
+                    state.error?.let { message ->
+                        Text(
+                            message,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
+                    }
+                    LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(state.rows, key = { it.confirmation.id }) { row ->
+                            ConfirmationCard(
+                                row = row,
+                                busy = row.confirmation.id in state.pendingIds,
+                                onAccept = { viewModel.answer(row, allow = true) {} },
+                                onDeny = { viewModel.answer(row, allow = false) {} }
+                            )
+                        }
                     }
                 }
             }

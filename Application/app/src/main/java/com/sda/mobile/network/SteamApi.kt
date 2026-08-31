@@ -53,7 +53,7 @@ class SteamApi(private val client: OkHttpClient = SteamHttpClient.newClient()) {
 
     suspend fun answerConfirmation(account: SteamGuardAccount, confirmation: Confirmation, allow: Boolean, time: Long): Boolean {
         val op = if (allow) "allow" else "cancel"
-        val tag = if (allow) "accept" else "reject"
+        val tag = op
         val params = ConfirmationHasher.buildConfirmationParams(
             deviceId = account.deviceId.orEmpty(),
             steamId64 = account.steamId64,
@@ -72,7 +72,7 @@ class SteamApi(private val client: OkHttpClient = SteamHttpClient.newClient()) {
 
     suspend fun answerMultipleConfirmations(account: SteamGuardAccount, confirmations: List<Confirmation>, allow: Boolean, time: Long): Boolean {
         val op = if (allow) "allow" else "cancel"
-        val tag = if (allow) "accept" else "reject"
+        val tag = op
         val params = ConfirmationHasher.buildConfirmationParams(
             deviceId = account.deviceId.orEmpty(),
             steamId64 = account.steamId64,

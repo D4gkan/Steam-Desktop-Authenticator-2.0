@@ -21,7 +21,7 @@ data class ConfirmationsUiState(
     val rows: List<ConfirmationRow> = emptyList(),
     val error: String? = null,
     /** ids currently being accepted/denied, so their row can show a spinner. */
-    val pendingIds: Set<Long> = emptySet()
+    val pendingIds: Set<String> = emptySet()
 )
 
 class ConfirmationsViewModel(application: Application) : AndroidViewModel(application) {
@@ -52,17 +52,22 @@ class ConfirmationsViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun answer(row: ConfirmationRow, allow: Boolean, onDone: (Boolean) -> Unit) {
-        _state.update { it.copy(pendingIds = it.pendingIds + row.confirmation.id) }
+        _state.update { it.copy(pendingIds = it.pendingIds + row.confirmation.id, error = null) }
         viewModelScope.launch {
+            var failureMessage: String? = null
             val ok = try {
-                if (allow) repo.accept(row.account, row.confirmation) else repo.deny(row.account, row.confirmation)
+                val result = if (allow) repo.accept(row.account, row.confirmation) else repo.deny(row.account, row.confirmation)
+                if (!result) failureMessage = "Steam rejected the ${if (allow) "approval" else "denial"}. Try again."
+                result
             } catch (e: Exception) {
+                failureMessage = e.message ?: "Failed to send confirmation response."
                 false
             }
             _state.update { s ->
                 s.copy(
                     pendingIds = s.pendingIds - row.confirmation.id,
-                    rows = if (ok) s.rows.filterNot { it.confirmation.id == row.confirmation.id } else s.rows
+                    rows = if (ok) s.rows.filterNot { it.confirmation.id == row.confirmation.id } else s.rows,
+                    error = failureMessage ?: s.error
                 )
             }
             onDone(ok)

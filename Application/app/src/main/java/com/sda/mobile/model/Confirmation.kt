@@ -30,10 +30,18 @@ enum class ConfirmationType(val id: Int) {
     }
 }
 
-/** Mirrors SteamAuth.Confirmation on desktop. */
+/** Mirrors SteamAuth.Confirmation on desktop.
+ *
+ * [id] and [key] are kept as the raw decimal strings Steam sent, not parsed into Long: Steam's
+ * "id" and (especially) "nonce" values are opaque unsigned 64-bit tokens that routinely exceed
+ * Long.MAX_VALUE. Parsing them with toLongOrNull() silently returns null on overflow, which was
+ * defaulting [key] to 0 - the confirmation would still *display* fine (nothing here needs the
+ * real value), but every accept/deny call echoed "ck=0" back to Steam instead of the real nonce,
+ * so Steam correctly rejected it (success:false) and the UI surfaced that as "Steam rejected the
+ * approval/denial. Try again." for every confirmation, every time. */
 data class Confirmation(
-    val id: Long,
-    val key: Long,
+    val id: String,
+    val key: String,
     val creator: Long,
     val headline: String?,
     val summary: List<String>,
@@ -54,8 +62,8 @@ data class Confirmation(
                 else -> null
             }
             return Confirmation(
-                id = obj["id"]?.jsonPrimitive?.content?.toLongOrNull() ?: 0L,
-                key = obj["nonce"]?.jsonPrimitive?.content?.toLongOrNull() ?: 0L,
+                id = obj["id"]?.jsonPrimitive?.contentOrNull ?: "",
+                key = obj["nonce"]?.jsonPrimitive?.contentOrNull ?: "",
                 creator = obj["creator_id"]?.jsonPrimitive?.content?.toLongOrNull() ?: 0L,
                 headline = obj["headline"]?.jsonPrimitive?.contentOrNull,
                 summary = obj["summary"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull } ?: emptyList(),
