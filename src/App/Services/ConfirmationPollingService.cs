@@ -70,7 +70,7 @@ namespace SteamDesktopAuthenticator.Services
                         {
                             confs = await acc.Account.FetchConfirmationsAsync();
                         }
-                        catch (Exception fetchEx) when (LooksLikeExpiredSession(fetchEx))
+                        catch (Exception fetchEx) when (LooksLikeExpiredSession(fetchEx) || acc.Account.Session.IsAccessTokenExpired())
                         {
                             Logger.Info("Confirmations", $"{Logger.AccountRef(acc.Account.Session.SteamID)} fetch failed ({fetchEx.Message}) - attempting session recovery.");
                             var outcome = await _recoveryService.EnsureValidSessionAsync(
@@ -112,17 +112,44 @@ namespace SteamDesktopAuthenticator.Services
             }
         }
 
-        /// <summary>SteamAuth's FetchConfirmationInternal throws a plain Exception (not a typed
-        /// one) for both "needauth" and any non-success response from Steam - so message
-        /// matching is the only signal available without changing SteamAuth's public exception
-        /// shape. Kept narrow (only the two known "your session is bad" messages) so unrelated
-        /// failures - bad device id, network errors, Steam outages - are surfaced normally
-        /// instead of triggering an unnecessary re-login attempt.</summary>
-        private static bool LooksLikeExpiredSession(Exception ex) =>
-            ex.Message != null &&
-            (ex.Message.Contains("Needs Authentication", StringComparison.OrdinalIgnoreCase) ||
-             ex.Message.Contains("Invalid Access Token", StringComparison.OrdinalIgnoreCase) ||
-             ex.Message.Contains("access_token", StringComparison.OrdinalIgnoreCase));
+        /// <summary>Detects an expired/invalid session from a failed request. Two distinct
+        /// failure shapes have to be covered here - this used to only catch the first one, which
+        /// was the actual bug behind automatic re-login never firing:
+        ///
+        ///  1. Steam accepts the HTTP request but replies 200 OK with a "the app-level session is
+        ///     stale" JSON body (SteamAuth's FetchConfirmationInternal throws a plain Exception
+        ///     for this - message text is the only signal without changing SteamAuth's public
+        ///     exception shape, so we match those known phrases).
+        ///  2. The access token itself is dead, so Steam rejects the request at the HTTP layer
+        ///     (401/403) before any JSON is returned. WebClient surfaces this as a WebException
+        ///     whose Message is just the generic HTTP status text (e.g. "The remote server
+        ///     returned an error: (401) Unauthorized."), which never matched the phrases above -
+        ///     so every real "your access token is expired" failure fell through to the generic
+        ///     catch below and reported as a plain poll failure, without ever calling
+        ///     SessionRecoveryService. This is the missing "Task 2" connection: the caller here
+        ///     now also checks the WebException's actual status code, and (see the call site)
+        ///     the account's own local token-expiry check as a further backstop, so any of the
+        ///     three signals is enough to trigger automatic recovery.</summary>
+        private static bool LooksLikeExpiredSession(Exception ex)
+        {
+            if (ex.Message != null &&
+                (ex.Message.Contains("Needs Authentication", StringComparison.OrdinalIgnoreCase) ||
+                 ex.Message.Contains("Invalid Access Token", StringComparison.OrdinalIgnoreCase) ||
+                 ex.Message.Contains("access_token", StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            if (ex is System.Net.WebException webEx &&
+                webEx.Response is System.Net.HttpWebResponse httpResponse &&
+                (httpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+                 httpResponse.StatusCode == System.Net.HttpStatusCode.Forbidden))
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public void Dispose() => Stop();
     }

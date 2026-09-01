@@ -203,7 +203,12 @@ namespace SteamDesktopAuthenticator.Services
             {
                 Username = account.AccountName,
                 Password = password,
-                IsPersistentSession = false,
+                // Task 5: use Steam's own official long-lived "remember me" session mechanism
+                // instead of a short browser-session-style refresh token, so an automatic
+                // re-login buys weeks/months of headroom rather than needing to repeat itself
+                // constantly. This is a legitimate, Steam-provided persistence flag - not a
+                // workaround.
+                IsPersistentSession = true,
                 PlatformType = EAuthTokenPlatformType.k_EAuthTokenPlatformType_MobileApp,
                 ClientOSType = EOSType.Android9,
                 // Headless authenticator: this account already has SDA as its Steam Guard

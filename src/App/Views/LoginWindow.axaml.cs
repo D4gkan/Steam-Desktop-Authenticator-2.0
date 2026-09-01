@@ -125,7 +125,10 @@ namespace SteamDesktopAuthenticator.Views
                 {
                     Username = username,
                     Password = password,
-                    IsPersistentSession = false,
+                    // Task 5: request Steam's official persistent/"remember me" session so the
+                    // refresh token this login yields lasts as long as Steam itself allows,
+                    // instead of expiring like a short browser session.
+                    IsPersistentSession = true,
                     PlatformType = EAuthTokenPlatformType.k_EAuthTokenPlatformType_MobileApp,
                     ClientOSType = EOSType.Android9,
                     Authenticator = new AvaloniaAuthenticator(_account, _dialogService),
