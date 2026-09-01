@@ -151,9 +151,16 @@ namespace SteamAuth
         {
             var confirmationsResponse = JsonConvert.DeserializeObject<ConfirmationsResponse>(response);
 
-            if (confirmationsResponse == null || !confirmationsResponse.Success)
+            if (confirmationsResponse == null)
             {
-                throw new Exception(confirmationsResponse.Message);
+                throw new Exception("Steam returned an unparseable response to the confirmations request.");
+            }
+
+            if (!confirmationsResponse.Success)
+            {
+                throw new Exception(string.IsNullOrEmpty(confirmationsResponse.Message)
+                    ? "Steam rejected the confirmations request."
+                    : confirmationsResponse.Message);
             }
 
             if (confirmationsResponse.NeedAuthentication)
