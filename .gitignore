@@ -35,6 +35,10 @@ Application/local.properties
 *.orig
 *.rej
 
+# Steam authenticator account data
+*.maFile
+**/maFiles/
+
 # Archive artifacts
 *.zip
 *.apk
