@@ -28,4 +28,8 @@ object ApiEndpoints {
     const val MOBILECONF_GETLIST = "$COMMUNITY_BASE/mobileconf/getlist"
     const val MOBILECONF_AJAXOP = "$COMMUNITY_BASE/mobileconf/ajaxop"
     const val MOBILECONF_MULTIAJAXOP = "$COMMUNITY_BASE/mobileconf/multiajaxop"
+
+    /** Public profile XML feed - no Web API key required, matching the rest of this project's
+     * key-less API usage. Used only to resolve a SteamID's avatarFull image URL. */
+    fun profileXml(steamId64: Long) = "$COMMUNITY_BASE/profiles/$steamId64/?xml=1"
 }

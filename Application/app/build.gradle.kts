@@ -22,8 +22,8 @@ android {
         applicationId = "com.sda.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "2.0.2"
+        versionCode = 3
+        versionName = "2.0.3"
     }
 
     buildTypes {
@@ -74,6 +74,9 @@ dependencies {
 
     // --- Networking ---
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Coil: async image loading + on-disk/memory caching for account avatars (v2.0.3).
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     // --- JSON (field names mirror the desktop app's Newtonsoft.Json models exactly,
     //     see model/*.kt - this keeps .maFile / manifest.json interchangeable with desktop) ---

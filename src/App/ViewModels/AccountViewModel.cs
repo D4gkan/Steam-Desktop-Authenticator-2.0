@@ -1,7 +1,9 @@
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SteamAuth;
 using SteamDesktopAuthenticator.Core;
+using SteamDesktopAuthenticator.Services;
 
 namespace SteamDesktopAuthenticator.ViewModels
 {
@@ -12,6 +14,15 @@ namespace SteamDesktopAuthenticator.ViewModels
 
         [ObservableProperty]
         private string _code = "-----";
+
+        /// <summary>Steam profile picture, once resolved. Null (the default) means "not
+        /// available" - the UI falls back to the existing initial-letter avatar circle in that
+        /// case, so a slow/failed fetch never leaves a gap in the layout.</summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasAvatar))]
+        private Bitmap? _avatarBitmap;
+
+        public bool HasAvatar => AvatarBitmap != null;
 
         [ObservableProperty]
         private double _codeProgress = 1.0; // 1.0 -> just refreshed, 0.0 -> about to rotate
@@ -67,6 +78,17 @@ namespace SteamDesktopAuthenticator.ViewModels
         {
             Account = account;
             Meta = meta;
+            LoadAvatar();
+        }
+
+        /// <summary>Kicks off an async, non-blocking avatar fetch for this account's SteamID.
+        /// Safe to call even when the SteamID is unknown/zero (no-op) or the network is
+        /// unavailable (AvatarBitmap simply stays null and the UI keeps the initial-letter
+        /// placeholder). Never throws and never delays construction of this view model.</summary>
+        private void LoadAvatar()
+        {
+            if (!ulong.TryParse(SteamId, out var steamId) || steamId == 0) return;
+            AvatarService.FetchAndApply(steamId, bitmap => AvatarBitmap = bitmap);
         }
 
         /// <summary>Recomputes the current Steam Guard code and how much of its 30s window remains.

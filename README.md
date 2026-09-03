@@ -8,7 +8,7 @@
 
 <sub><b>We are not affiliated with Steam or Scrap.TF in any way!</b> This project is run by community volunteers.</sub>
 
-[![Latest Release](https://img.shields.io/badge/version-2.0.2-3fb950?style=for-the-badge)](#-download--install)
+[![Latest Release](https://img.shields.io/badge/version-2.0.3-3fb950?style=for-the-badge)](#-download--install)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20·%20Android-0078D6?style=for-the-badge&logo=linux)](#-download--install)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
@@ -152,7 +152,7 @@ Android is a supported companion platform for this project and is intended for m
 ### 🪟 Windows
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.2/SteamDesktopAuthenticator-v2.0.2-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.2-win-x64.zip</code></a>.</td></tr>
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.3/SteamDesktopAuthenticator-v2.0.3-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.3-win-x64.zip</code></a>.</td></tr>
 <tr><td>2️⃣</td><td>Right-click the downloaded zip and choose <b>Extract All…</b> (or use 7-Zip/WinRAR) to a <b>safe, permanent folder</b> — e.g. <code>C:\SDA</code>. Don't run it from inside your Downloads or a temp folder, since losing this folder later can mean losing access to your Steam account(s).</td></tr>
 <tr><td>3️⃣</td><td>Open the extracted folder and double-click <b>SteamDesktopAuthenticator.exe</b> to launch the app.</td></tr>
 <tr><td>4️⃣</td><td>If Windows SmartScreen shows a warning (common for apps without a paid code-signing certificate), click <b>More info → Run anyway</b>.</td></tr>
@@ -163,8 +163,8 @@ No separate .NET install is required — the Windows build is self-contained.
 ### 🐧 Linux
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.2/SteamDesktopAuthenticator-v2.0.2-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.2-linux-x64.zip</code></a>.</td></tr>
-<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.2-linux-x64.zip -d ~/SDA
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.3/SteamDesktopAuthenticator-v2.0.3-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.3-linux-x64.zip</code></a>.</td></tr>
+<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.3-linux-x64.zip -d ~/SDA
 cd ~/SDA</pre></td></tr>
 <tr><td>3️⃣</td><td>Make the binary executable (only needs to be done once):<br><pre>chmod +x SteamDesktopAuthenticator</pre></td></tr>
 <tr><td>4️⃣</td><td>Launch it:<br><pre>./SteamDesktopAuthenticator</pre>Or double-click it from your file manager if it's set to allow executing files.</td></tr>
@@ -199,7 +199,7 @@ Wherever you extract the app, make sure it's somewhere you'll **remember and bac
 ### The account list
 
 The left panel lists every account you've added. Each entry shows:
-- The account's display name and initial avatar.
+- The account's display name and avatar — its Steam profile picture is fetched and cached automatically (as of v2.0.3), falling back to an initial-letter avatar while it loads or if it can't be fetched.
 - The current Steam Guard code, with a progress bar showing time until the next refresh.
 - A **disabled** tag if you've turned off polling for that account.
 - A badge with the number of pending confirmations, if any.
@@ -280,6 +280,16 @@ This mirrors the safety flow of Steam's own authenticator removal, so you can't 
 - **Always back up your entire `maFiles` folder.** If you lose it — or your encryption key — and didn't save your revocation code, there is no way to recover the account.
 - If you lost your `maFiles` **or** your encryption key, go to [Steam's Manage Two-Factor page](https://store.steampowered.com/twofactor/manage), click **"Remove Authenticator,"** and enter the revocation code you saved during setup.
 - Didn't write down your revocation code either? Your only remaining option is to contact [Steam Support](https://support.steampowered.com/) and explain that you've lost both your mobile authenticator and revocation code.
+
+---
+
+## 📝 Changelog
+
+## v2.0.3
+
+- Added automatic Steam profile picture/avatar fetching for accounts.
+- Added profile picture display on Windows, Linux, and Android.
+- Updated application version to 2.0.3.
 
 ---
 
