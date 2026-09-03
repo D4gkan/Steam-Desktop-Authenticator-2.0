@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sda.mobile.data.AccountRepository
+import com.sda.mobile.data.AvatarRepository
 import com.sda.mobile.data.CredentialStore
 import com.sda.mobile.data.UiMetaRepository
 import com.sda.mobile.model.AccountMeta
@@ -29,6 +30,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val uiMetaRepository = UiMetaRepository(application)
     private val steamApi = SteamApi()
     val credentialStore = CredentialStore(application)
+
+    /** Resolves Steam profile-picture URLs for the account list. Deliberately not part of
+     * UiState: it's a best-effort, per-account cache that the account cards read from directly
+     * (see AccountListScreen), so a slow/failed avatar lookup never triggers a state update or
+     * recomposition of anything beyond that one card. */
+    val avatarRepository = AvatarRepository()
 
     data class AccountEntry(val account: SteamGuardAccount, val meta: AccountMeta)
 

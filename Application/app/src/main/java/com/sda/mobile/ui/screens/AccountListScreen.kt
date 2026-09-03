@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -21,7 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.sda.mobile.crypto.SteamGuardCodeGenerator
+import com.sda.mobile.data.AvatarRepository
 import com.sda.mobile.model.SteamGuardAccount
 import com.sda.mobile.network.TimeAligner
 import com.sda.mobile.ui.viewmodel.AppViewModel
@@ -112,6 +115,7 @@ fun AccountListScreen(
                             account = entry.account,
                             displayName = entry.meta.displayName,
                             nowSeconds = nowSeconds,
+                            avatarRepository = viewModel.avatarRepository,
                             onLongPress = { accountForActions = entry.account }
                         )
                     }
@@ -157,14 +161,27 @@ private fun EmptyAccountsHint(onAddAccount: () -> Unit, modifier: Modifier = Mod
     }
 }
 
-@Composable
-private fun AccountCard(account: SteamGuardAccount, displayName: String?, nowSeconds: Long, onLongPress: () -> Unit) {
+private fun AccountCard(
+    account: SteamGuardAccount,
+    displayName: String?,
+    nowSeconds: Long,
+    avatarRepository: AvatarRepository,
+    onLongPress: () -> Unit
+) {
     val clipboard = LocalClipboardManager.current
     val code = remember(account.sharedSecret, nowSeconds / 30) {
         SteamGuardCodeGenerator.generateCode(account.sharedSecret, nowSeconds)
     }
     val secondsIntoStep = (nowSeconds % 30).toInt()
     val progress = 1f - (secondsIntoStep / 30f)
+
+    // Resolved lazily and off the main flow: a slow/failed avatar lookup only ever affects this
+    // one card's avatarUrl (stays null -> placeholder shown), never account loading or the rest
+    // of the list. Coil (AsyncImage below) owns the actual image download + on-disk caching.
+    var avatarUrl by remember(account.steamId64) { mutableStateOf(avatarRepository.getCached(account.steamId64)) }
+    LaunchedEffect(account.steamId64) {
+        if (avatarUrl == null) avatarUrl = avatarRepository.resolve(account.steamId64)
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -178,6 +195,8 @@ private fun AccountCard(account: SteamGuardAccount, displayName: String?, nowSec
             Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            AccountAvatar(avatarUrl = avatarUrl, initial = (displayName ?: account.accountName)?.take(1))
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = displayName ?: account.accountName ?: "Unknown account",
@@ -211,6 +230,35 @@ private fun AccountCard(account: SteamGuardAccount, displayName: String?, nowSec
             IconButton(onClick = onLongPress) {
                 Icon(Icons.Default.MoreVert, contentDescription = "Account actions")
             }
+        }
+    }
+}
+
+/** Steam profile picture if resolved, otherwise the same initial-letter placeholder the app
+ * always used. AsyncImage silently keeps showing nothing (letting the Box's placeholder Text
+ * remain visible underneath) if the URL is null or the load fails - offline/unavailable never
+ * produces an error state here. */
+@Composable
+private fun AccountAvatar(avatarUrl: String?, initial: String?) {
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = initial?.uppercase()?.ifBlank { "?" } ?: "?",
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        if (avatarUrl != null) {
+            AsyncImage(
+                model = avatarUrl,
+                contentDescription = null,
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

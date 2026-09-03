@@ -37,11 +37,19 @@
                 <DataTemplate x:DataType="vm:AccountViewModel">
                   <Border Classes="card account-card" Margin="0,0,0,10" Padding="14,12" Tag="{Binding}">
                     <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto">
-                      <!-- Avatar circle with initial -->
+                      <!-- Avatar circle: shows the fetched Steam profile picture once available,
+                           clipped to a circle to match the existing placeholder shape. Falls back
+                           to the initial-letter placeholder while loading or if the fetch failed
+                           (offline, Steam unavailable, etc.) - HasAvatar/AvatarBitmap default to
+                           false/null so this is always the initial state. -->
                       <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="38" Height="38" CornerRadius="19"
-                              Background="{DynamicResource AccentBrush}" Margin="0,0,12,0">
-                        <TextBlock Text="{Binding DisplayName[0]}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="Bold" Foreground="#04231D" FontSize="16"/>
+                              Background="{DynamicResource AccentBrush}" Margin="0,0,12,0" ClipToBounds="True">
+                        <Panel>
+                          <TextBlock Text="{Binding DisplayName[0]}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                     FontWeight="Bold" Foreground="#04231D" FontSize="16" IsVisible="{Binding !HasAvatar}"/>
+                          <Image Source="{Binding AvatarBitmap}" Width="38" Height="38" Stretch="UniformToFill"
+                                 IsVisible="{Binding HasAvatar}"/>
+                        </Panel>
                       </Border>
 
                       <!-- Middle: name/badges + code/progress. MinWidth=0 lets this column shrink instead of
@@ -176,7 +184,7 @@
              failing per-account in the background and there was no way to see what. -->
         <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Classes="muted" FontSize="11"
                    TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-        <TextBlock Grid.Column="1" Text="v2.0.2" Classes="muted" FontSize="11" HorizontalAlignment="Right" Margin="12,0,0,0"/>
+        <TextBlock Grid.Column="1" Text="v2.0.3" Classes="muted" FontSize="11" HorizontalAlignment="Right" Margin="12,0,0,0"/>
       </Grid>
     </Border>
 
