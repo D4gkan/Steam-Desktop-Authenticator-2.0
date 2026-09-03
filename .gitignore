@@ -17,6 +17,7 @@ Thumbs.db
 **/.idea/
 **/*.iml
 **/local.properties
+dist/
 
 # Android project noise
 Application/.gradle/
