@@ -161,6 +161,7 @@ private fun EmptyAccountsHint(onAddAccount: () -> Unit, modifier: Modifier = Mod
     }
 }
 
+@Composable
 private fun AccountCard(
     account: SteamGuardAccount,
     displayName: String?,
