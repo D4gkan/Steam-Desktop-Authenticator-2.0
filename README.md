@@ -8,7 +8,7 @@
 
 <sub><b>We are not affiliated with Steam or Scrap.TF in any way!</b> This project is run by community volunteers.</sub>
 
-[![Latest Release](https://img.shields.io/badge/version-2.0.3-3fb950?style=for-the-badge)](#-download--install)
+[![Latest Release](https://img.shields.io/badge/version-2.0.4-3fb950?style=for-the-badge)](#-download--install)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20·%20Android-0078D6?style=for-the-badge&logo=linux)](#-download--install)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
@@ -152,7 +152,7 @@ Android is a supported companion platform for this project and is intended for m
 ### 🪟 Windows
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.3/SteamDesktopAuthenticator-v2.0.3-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.3-win-x64.zip</code></a>.</td></tr>
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.4/SteamDesktopAuthenticator-v2.0.4-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.4-win-x64.zip</code></a>.</td></tr>
 <tr><td>2️⃣</td><td>Right-click the downloaded zip and choose <b>Extract All…</b> (or use 7-Zip/WinRAR) to a <b>safe, permanent folder</b> — e.g. <code>C:\SDA</code>. Don't run it from inside your Downloads or a temp folder, since losing this folder later can mean losing access to your Steam account(s).</td></tr>
 <tr><td>3️⃣</td><td>Open the extracted folder and double-click <b>SteamDesktopAuthenticator.exe</b> to launch the app.</td></tr>
 <tr><td>4️⃣</td><td>If Windows SmartScreen shows a warning (common for apps without a paid code-signing certificate), click <b>More info → Run anyway</b>.</td></tr>
@@ -163,8 +163,8 @@ No separate .NET install is required — the Windows build is self-contained.
 ### 🐧 Linux
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.3/SteamDesktopAuthenticator-v2.0.3-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.3-linux-x64.zip</code></a>.</td></tr>
-<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.3-linux-x64.zip -d ~/SDA
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.4/SteamDesktopAuthenticator-v2.0.4-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.4-linux-x64.zip</code></a>.</td></tr>
+<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.4-linux-x64.zip -d ~/SDA
 cd ~/SDA</pre></td></tr>
 <tr><td>3️⃣</td><td>Make the binary executable (only needs to be done once):<br><pre>chmod +x SteamDesktopAuthenticator</pre></td></tr>
 <tr><td>4️⃣</td><td>Launch it:<br><pre>./SteamDesktopAuthenticator</pre>Or double-click it from your file manager if it's set to allow executing files.</td></tr>
@@ -284,6 +284,13 @@ This mirrors the safety flow of Steam's own authenticator removal, so you can't 
 ---
 
 ## 📝 Changelog
+
+## v2.0.4
+
+- Exclude local authenticator records and generated artifacts from source control.
+- Add a synthetic desktop-format Android import fixture.
+- Include Android launcher icon and Compose annotation fixes since v2.0.3.
+- Preserve account storage formats and authenticator behavior.
 
 ## v2.0.3
 
