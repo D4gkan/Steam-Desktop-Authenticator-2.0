@@ -72,6 +72,8 @@ fun AddAccountScreen(onDone: () -> Unit, onStartLogin: () -> Unit, viewModel: Ap
                             .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                             .setPrompt("Scan the QR code shown in SDA desktop")
                             .setBeepEnabled(false)
+                            .setOrientationLocked(false)
+                            .addExtra("TRY_HARDER", true)
                     )
                 }
             )

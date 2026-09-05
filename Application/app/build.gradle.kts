@@ -22,8 +22,8 @@ android {
         applicationId = "com.sda.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "2.0.4"
+        versionCode = 5
+        versionName = "2.0.5"
     }
 
     buildTypes {

@@ -184,7 +184,7 @@
              failing per-account in the background and there was no way to see what. -->
         <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Classes="muted" FontSize="11"
                    TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-        <TextBlock Grid.Column="1" Text="v2.0.4" Classes="muted" FontSize="11" HorizontalAlignment="Right" Margin="12,0,0,0"/>
+        <TextBlock Grid.Column="1" Text="v2.0.5" Classes="muted" FontSize="11" HorizontalAlignment="Right" Margin="12,0,0,0"/>
       </Grid>
     </Border>
 

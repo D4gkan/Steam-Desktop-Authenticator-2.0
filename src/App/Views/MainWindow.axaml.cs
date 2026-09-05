@@ -87,6 +87,13 @@ namespace SteamDesktopAuthenticator.Views
                 }
             };
 
+            var displayQrCodeItem = new MenuItem { Header = "Display QR Code" };
+            displayQrCodeItem.Click += async (_, _) =>
+            {
+                var qrWindow = new QrExportWindow(account.Account);
+                await qrWindow.ShowDialog(this);
+            };
+
             var forgetPasswordItem = new MenuItem { Header = "Forget Saved Password" };
             forgetPasswordItem.Click += (_, _) => _vm.ForgetSavedPassword(account);
 
@@ -99,6 +106,7 @@ namespace SteamDesktopAuthenticator.Views
             menu.Items.Add(renameItem);
             menu.Items.Add(toggleItem);
             menu.Items.Add(reloginItem);
+            menu.Items.Add(displayQrCodeItem);
             if (account.Meta.SaveLoginEnabled) menu.Items.Add(forgetPasswordItem);
             menu.Items.Add(new Separator());
             menu.Items.Add(deactivateItem);

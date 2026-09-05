@@ -51,8 +51,8 @@ fun QrExportScreen(steamId64: Long, onBack: () -> Unit, viewModel: AppViewModel)
 
             Spacer(Modifier.height(24.dp))
 
-            val plaintext = remember(account) { viewModel.exportAccountPlaintext(account) }
-            val bitmap = remember(plaintext) { generateQrBitmap(plaintext, 800) }
+            val qrPayload = remember(account) { viewModel.exportAccountQrPayload(account) }
+            val bitmap = remember(qrPayload) { generateQrBitmap(qrPayload, 800) }
 
             if (bitmap == null) {
                 Text(

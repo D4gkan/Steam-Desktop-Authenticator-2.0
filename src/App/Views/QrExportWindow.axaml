@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SteamDesktopAuthenticator.Views.QrExportWindow"
+        Width="520" Height="690" MinWidth="420" MinHeight="570"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgPanelBrush}"
+        Title="Display QR Code">
+  <ScrollViewer>
+    <Border Padding="24">
+      <StackPanel Spacing="16">
+        <TextBlock Classes="h1" Text="Display QR Code"/>
+
+        <Border Background="#3D2A1E" BorderBrush="#D19A4A" BorderThickness="1"
+                CornerRadius="8" Padding="14">
+          <TextBlock Text="This QR code contains your full Steam Guard secret in plain text, even if your local files are encrypted. Anyone who scans it can generate your two-factor codes and approve trade or market confirmations. Only show it to a device you control, then close this window."
+                     TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        </Border>
+
+        <Border Background="White" Padding="12" CornerRadius="6"
+                HorizontalAlignment="Center">
+          <Image x:Name="QrCodeImage" Width="400" Height="400"
+                 RenderOptions.BitmapInterpolationMode="LowQuality"
+                 Stretch="Uniform"/>
+        </Border>
+
+        <TextBlock x:Name="ErrorText" IsVisible="False" TextWrapping="Wrap"
+                   TextAlignment="Center" Foreground="#E57373"/>
+        <TextBlock x:Name="AccountNameText" Classes="h2"
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+        <Button Classes="primary" Content="Close" HorizontalAlignment="Right"
+                Click="OnCloseClick"/>
+      </StackPanel>
+    </Border>
+  </ScrollViewer>
+</Window>

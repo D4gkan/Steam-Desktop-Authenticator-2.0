@@ -164,6 +164,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun exportAccountPlaintext(account: SteamGuardAccount): String =
         accountRepository.exportAccountPlaintext(account)
 
+    fun exportAccountQrPayload(account: SteamGuardAccount): String =
+        accountRepository.exportAccountQrPayload(account)
+
     fun clearSessionExpiredPrompt() {
         _state.update { it.copy(expiredSessionAccountId = null, expiredSessionMessage = null) }
     }

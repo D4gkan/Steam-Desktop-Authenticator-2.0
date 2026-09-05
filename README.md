@@ -8,7 +8,7 @@
 
 <sub><b>We are not affiliated with Steam or Scrap.TF in any way!</b> This project is run by community volunteers.</sub>
 
-[![Latest Release](https://img.shields.io/badge/version-2.0.4-3fb950?style=for-the-badge)](#-download--install)
+[![Latest Release](https://img.shields.io/badge/version-2.0.5-3fb950?style=for-the-badge)](#-download--install)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20·%20Android-0078D6?style=for-the-badge&logo=linux)](#-download--install)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
@@ -147,12 +147,16 @@ The repository also includes an Android companion app in [Application/README.md]
 
 Android is a supported companion platform for this project and is intended for mobile access alongside the desktop app. It is not a replacement for the official Steam Mobile app, but it is a supported, maintained part of the SDA ecosystem.
 
+### QR account transfer
+
+To move an account from the desktop app to SDA Mobile, open the account's three-dot menu and choose **Display QR Code**, then use **Scan QR from desktop** in the Android app. QR export is available on both Windows and Linux. The QR contains the Steam Guard secrets and Steam ID in a compact unencrypted transport, but deliberately excludes session tokens so the code remains quick to scan. Show it only to a device you control and close the window immediately after scanning; SDA Mobile may request a login later for authenticated features such as confirmations.
+
 ## 📦 Download & Install
 
 ### 🪟 Windows
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.4/SteamDesktopAuthenticator-v2.0.4-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.4-win-x64.zip</code></a>.</td></tr>
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.5/SteamDesktopAuthenticator-v2.0.5-win-x64.zip"><code>SteamDesktopAuthenticator-v2.0.5-win-x64.zip</code></a>.</td></tr>
 <tr><td>2️⃣</td><td>Right-click the downloaded zip and choose <b>Extract All…</b> (or use 7-Zip/WinRAR) to a <b>safe, permanent folder</b> — e.g. <code>C:\SDA</code>. Don't run it from inside your Downloads or a temp folder, since losing this folder later can mean losing access to your Steam account(s).</td></tr>
 <tr><td>3️⃣</td><td>Open the extracted folder and double-click <b>SteamDesktopAuthenticator.exe</b> to launch the app.</td></tr>
 <tr><td>4️⃣</td><td>If Windows SmartScreen shows a warning (common for apps without a paid code-signing certificate), click <b>More info → Run anyway</b>.</td></tr>
@@ -163,8 +167,8 @@ No separate .NET install is required — the Windows build is self-contained.
 ### 🐧 Linux
 
 <table>
-<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.4/SteamDesktopAuthenticator-v2.0.4-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.4-linux-x64.zip</code></a>.</td></tr>
-<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.4-linux-x64.zip -d ~/SDA
+<tr><td>1️⃣</td><td>Download <a href="https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.5/SteamDesktopAuthenticator-v2.0.5-linux-x64.zip"><code>SteamDesktopAuthenticator-v2.0.5-linux-x64.zip</code></a>.</td></tr>
+<tr><td>2️⃣</td><td>Extract it to a safe, permanent folder. From a terminal:<br><pre>unzip SteamDesktopAuthenticator-v2.0.5-linux-x64.zip -d ~/SDA
 cd ~/SDA</pre></td></tr>
 <tr><td>3️⃣</td><td>Make the binary executable (only needs to be done once):<br><pre>chmod +x SteamDesktopAuthenticator</pre></td></tr>
 <tr><td>4️⃣</td><td>Launch it:<br><pre>./SteamDesktopAuthenticator</pre>Or double-click it from your file manager if it's set to allow executing files.</td></tr>
@@ -172,7 +176,11 @@ cd ~/SDA</pre></td></tr>
 
 > **Linux status:** Linux is supported and included in the official release builds. If the app does not launch on your distro, check the [Troubleshooting](#-troubleshooting) section below and open an issue with your distro details.
 
-### Both platforms
+### Android
+
+Download [`SDA-Mobile-v2.0.5.apk`](https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.5/SDA-Mobile-v2.0.5.apk), allow installation from your browser or file manager when Android asks, then open the APK. This is a sideloaded release and is not distributed through Google Play.
+
+### Both desktop platforms
 
 Wherever you extract the app, make sure it's somewhere you'll **remember and back up long-term** — specifically the `maFiles` folder the app creates there, since that's what holds your linked authenticators. Losing it (without a saved revocation code) can mean permanently losing access to your Steam account.
 
@@ -284,6 +292,15 @@ This mirrors the safety flow of Steam's own authenticator removal, so you can't 
 ---
 
 ## 📝 Changelog
+
+## v2.0.5
+
+- Add desktop QR account export on Windows and Linux for transfer to SDA Mobile.
+- Compress QR transfers and omit session credentials for reliable phone-camera scanning.
+- Keep Android imports compatible with legacy plaintext `.maFile` QR payloads.
+- Display a clear warning because exported QR data contains the full Steam Guard secret in plaintext.
+- Publish versioned Windows x64, Linux x64, and Android release builds.
+- Update desktop and Android application versions to 2.0.5.
 
 ## v2.0.4
 

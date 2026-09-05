@@ -154,7 +154,8 @@ class AccountRepository(context: Context) {
      * passkey so every stored account stays under one key, matching desktop behavior. */
     suspend fun importPlaintextMaFile(manifest: Manifest, fileText: String, currentPassKey: String? = null): Result<Manifest> =
         withContext(Dispatchers.IO) {
-            val normalizedText = normalizeJsonText(fileText)
+            val normalizedText = runCatching { QrPayloadCodec.decodeIfEncoded(fileText) }
+                .getOrElse { error -> return@withContext Result.failure(error) }
             val account = runCatching { json.decodeFromString<SteamGuardAccount>(normalizedText) }.getOrNull()
                 ?: return@withContext Result.failure(IllegalArgumentException("That file isn't a valid (unencrypted) .maFile."))
 
@@ -167,4 +168,14 @@ class AccountRepository(context: Context) {
      * unencrypted .maFile has on desktop. */
     fun exportAccountPlaintext(account: SteamGuardAccount): String =
         json.encodeToString(SteamGuardAccount.serializer(), account)
+
+    /** Compact QR transport; deliberately separate from plaintext file export. */
+    fun exportAccountQrPayload(account: SteamGuardAccount): String {
+        // Access/refresh JWTs dominate the payload and create a QR code whose modules are too
+        // small for phone cameras to resolve reliably from a desktop display. They are not
+        // needed for Steam Guard code generation; keeping SteamID lets the imported account be
+        // stored normally, while the app can ask for login later if confirmations are opened.
+        val qrAccount = account.withoutQrSessionCredentials()
+        return QrPayloadCodec.encode(exportAccountPlaintext(qrAccount))
+    }
 }
