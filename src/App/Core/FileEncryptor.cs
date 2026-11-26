@@ -42,8 +42,11 @@ namespace SteamDesktopAuthenticator.Core
             if (string.IsNullOrEmpty(password)) throw new ArgumentException("Password is empty");
             if (string.IsNullOrEmpty(salt)) throw new ArgumentException("Salt is empty");
 
-            using var pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), PBKDF2_ITERATIONS, HashAlgorithmName.SHA1);
-            return pbkdf2.GetBytes(KEY_SIZE_BYTES);
+            // The one-shot API uses the platform PBKDF2 implementation. The instance
+            // API performs its iteration loop in managed code, which is particularly
+            // slow in the iOS interpreter. Parameters and resulting bytes are identical.
+            return Rfc2898DeriveBytes.Pbkdf2(password, Convert.FromBase64String(salt),
+                PBKDF2_ITERATIONS, HashAlgorithmName.SHA1, KEY_SIZE_BYTES);
         }
 
         public static string? DecryptData(string password, string passwordSalt, string iv, string encryptedData)

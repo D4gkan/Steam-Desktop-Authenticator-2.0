@@ -9,7 +9,7 @@
 <sub><b>We are not affiliated with Steam or Scrap.TF in any way!</b> This project is run by community volunteers.</sub>
 
 [![Latest Release](https://img.shields.io/badge/version-2.0.5-3fb950?style=for-the-badge)](#-download--install)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20·%20Android-0078D6?style=for-the-badge&logo=linux)](#-download--install)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B%20·%20Linux%20·%20Android%20·%20iOS-0078D6?style=for-the-badge&logo=linux)](#-download--install)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 </div>
@@ -29,7 +29,9 @@
 
 - [What is this?](#-what-is-this)
 - [Feature overview](#-feature-overview)
+- [iOS companion and updated interface](#ios-companion-and-updated-interface)
 - [Download & Install](#-download--install)
+  - [Install on iPhone with Sideloadly](#install-on-iphone-with-sideloadly)
 - [First-time setup](#-first-time-setup)
 - [Using the app](#-using-the-app)
   - [The account list](#the-account-list)
@@ -66,10 +68,11 @@ It's aimed at people who manage several Steam accounts (traders, bot operators, 
 
 ## 🗂️ Repository layout
 
-This repository contains the Windows/Linux desktop app and a supported Android companion app:
+This repository contains the Windows/Linux desktop app and Android and iOS companions:
 
 - `src/` — the main desktop client built with Avalonia and .NET for Windows and Linux.
 - `Application/` — the Android app built with Kotlin and Jetpack Compose.
+- `src/iOS/` — the iPhone/iPad host, with its Avalonia interface in `src/Mobile/` and account services in `src/Mobile.Core/`.
 - `SteamDesktopAuthenticator.sln` — the Visual Studio solution for the desktop project.
 
 The Android app is a first-class companion to the desktop project: it uses the same `.maFile` and `manifest.json` conventions and is intended to work with the same account workflows. See [Application/README.md](Application/README.md) for its setup and build notes.
@@ -151,6 +154,39 @@ Android is a supported companion platform for this project and is intended for m
 
 To move an account from the desktop app to SDA Mobile, open the account's three-dot menu and choose **Display QR Code**, then use **Scan QR from desktop** in the Android app. QR export is available on both Windows and Linux. The QR contains the Steam Guard secrets and Steam ID in a compact unencrypted transport, but deliberately excludes session tokens so the code remains quick to scan. Show it only to a device you control and close the window immediately after scanning; SDA Mobile may request a login later for authenticated features such as confirmations.
 
+## iOS companion and updated interface
+
+SDA Mobile for iOS targets **iPhone and iPad running iOS 16 or later**. Installation and
+use have been confirmed on an **iPhone 14 Pro**. This is an initial iOS implementation;
+iPad layouts and the full range of account-linking and recovery flows need further
+device testing.
+
+The iOS interface uses a midnight purple/black gradient with muted lavender accents,
+two main tabs, and compact account cards:
+
+- **Accounts:** tap a name or code to copy the current Steam Guard code. A circular
+  timer shows when it changes; the three-dot menu holds backup, transfer QR, and account actions.
+- **Confirmations:** review pending items from all saved accounts in one list. Pull
+  down or tap the refresh icon to reload; the tab badge shows the pending count.
+- **Add accounts:** use the floating **+** button to import a `.maFile`, scan a desktop
+  QR, paste account data, or link an authenticator. Imports require Steam sign-in.
+- **Security:** a short icon splash leads directly to a six-digit passcode using the
+  iPhone's number keyboard. Keychain protection, encrypted storage, and a 15-minute
+  background auto-lock protect the saved accounts.
+
+<table>
+<tr><th>Accounts</th><th>Combined confirmations</th></tr>
+<tr>
+<td><img src="docs/images/ios-accounts.png" width="280" alt="iOS account list with circular timers and account menus" /></td>
+<td><img src="docs/images/ios-confirmations.png" width="280" alt="iOS confirmations from two synthetic accounts with approve and reject actions" /></td>
+</tr>
+</table>
+
+These screenshots come from the iPhone simulator and contain synthetic accounts only.
+See the [iOS guide](docs/ios.md) for account workflows, security details, development,
+and current limitations. The iOS app is installed through sideloading; it is not an App
+Store or TestFlight release.
+
 ## 📦 Download & Install
 
 ### 🪟 Windows
@@ -179,6 +215,37 @@ cd ~/SDA</pre></td></tr>
 ### Android
 
 Download [`SDA-Mobile-v2.0.5.apk`](https://github.com/D4gkan/Steam-Desktop-Authenticator-2.0/releases/download/v2.0.5/SDA-Mobile-v2.0.5.apk), allow installation from your browser or file manager when Android asks, then open the APK. This is a sideloaded release and is not distributed through Google Play.
+
+### Install on iPhone with Sideloadly
+
+You can install from a **Windows PC** with a **free Apple Account**. You do not need
+your own Mac, a paid Apple Developer membership, or a jailbreak. GitHub Actions builds
+the IPA on a cloud Mac; [Sideloadly](https://sideloadly.io/) signs and installs it locally.
+
+1. In this repository's **Actions** tab, open **iOS IPA** and choose a successful run.
+   Download **SDA-Mobile-iOS-unsigned** from **Artifacts**. If building in a fork, enable
+   its Actions workflows first; see the [build guide](docs/ios.md#windows-only-build-and-install).
+2. Extract the downloaded ZIP. Use **`SDA-Mobile-iOS-unsigned.ipa`** inside it, rather
+   than the outer ZIP. The artifact also includes a SHA-256 checksum.
+3. Install [Sideloadly](https://sideloadly.io/) and the **web-download versions of iTunes
+   and iCloud** linked on its official site. Sideloadly requires those Windows versions
+   instead of the Microsoft Store packages.
+4. Connect the unlocked iPhone by USB, accept **Trust This Computer**, and select the
+   phone in Sideloadly. Drop in the IPA, enter your Apple Account, press **Start**, and
+   complete any Apple verification prompts. Wait for **Done**.
+5. If the phone reports **Untrusted Developer**, open **Settings → General → VPN &
+   Device Management**, select the Apple Account used to install, and trust that developer.
+6. Enable **Settings → Privacy & Security → Developer Mode** if required, then restart
+   and confirm the prompt. See [Apple's Developer Mode instructions](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device).
+7. Open **SDA Mobile**, create and confirm your six-digit passcode, then use **+** to
+   import or scan an account. Enter that account's Steam password when asked.
+
+Free-account signatures last **seven days**. Enable Sideloadly's automatic refresh and
+keep its daemon running with the phone reachable over USB or configured Wi-Fi. To
+refresh or update, use the **same Apple Account and bundle ID** and install over the
+existing app. You can re-sign the same IPA without another GitHub build. See the
+[Sideloadly FAQ](https://sideloadly.io/faq) for refresh and connection troubleshooting.
+Keep an encrypted account export before uninstalling or changing the signing identity.
 
 ### Both desktop platforms
 
