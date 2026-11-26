@@ -18,6 +18,8 @@ Thumbs.db
 **/*.iml
 **/local.properties
 dist/
+__pycache__/
+*.py[cod]
 
 # Android project noise
 Application/.gradle/
@@ -43,3 +45,11 @@ Application/local.properties
 *.zip
 *.apk
 *.aab
+
+# iOS build and signing artifacts
+*.ipa
+*.xcarchive/
+*.dSYM/
+*.mobileprovision
+*.p12
+*.pfx

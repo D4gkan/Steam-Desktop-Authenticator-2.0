@@ -1,0 +1,43 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Sda.Mobile.App" RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <SolidColorBrush x:Key="AccentBrush" Color="#8B80D8" />
+    <SolidColorBrush x:Key="MenuItemBackgroundPointerOver" Color="#282033" />
+    <SolidColorBrush x:Key="MenuItemBackgroundPressed" Color="#352946" />
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark" Accent="#8B80D8" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
+    <Style Selector="TextBlock"><Setter Property="Foreground" Value="#E8E6EF" /><Setter Property="FontSize" Value="14" /></Style>
+    <Style Selector="TextBlock.muted"><Setter Property="Foreground" Value="#9995A7" /><Setter Property="FontSize" Value="12" /><Setter Property="LineHeight" Value="19" /></Style>
+    <Style Selector="TextBlock.section"><Setter Property="Foreground" Value="#9995A7" /><Setter Property="FontSize" Value="12" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="Button"><Setter Property="MinHeight" Value="48" /><Setter Property="CornerRadius" Value="12" /><Setter Property="Background" Value="#18171F" /><Setter Property="Foreground" Value="#D6D2E3" /><Setter Property="BorderBrush" Value="#2C2937" /><Setter Property="BorderThickness" Value="1" /><Setter Property="FontSize" Value="13" /><Setter Property="FontWeight" Value="Medium" /><Setter Property="HorizontalContentAlignment" Value="Center" /></Style>
+    <Style Selector="Button.primary"><Setter Property="Background" Value="#6855BD" /><Setter Property="BorderBrush" Value="#7A66D1" /><Setter Property="Foreground" Value="#F0EDF8" /></Style>
+    <Style Selector="Button.quiet"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /></Style>
+    <Style Selector="Button.icon"><Setter Property="Width" Value="44" /><Setter Property="Height" Value="44" /><Setter Property="MinHeight" Value="44" /><Setter Property="Padding" Value="12" /></Style>
+    <Style Selector="Button.nav"><Setter Property="MinHeight" Value="60" /><Setter Property="CornerRadius" Value="12" /><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Foreground" Value="#8A8599" /><Setter Property="Padding" Value="8" /></Style>
+    <Style Selector="Button.nav.active"><Setter Property="Foreground" Value="#B1A1E5" /></Style>
+    <Style Selector="Button.key"><Setter Property="FontSize" Value="25" /><Setter Property="BorderThickness" Value="0" /><Setter Property="MinHeight" Value="58" /></Style>
+    <Style Selector="Border.divider"><Setter Property="Height" Value="1" /><Setter Property="Background" Value="#272330" /><Setter Property="Margin" Value="18,0" /></Style>
+    <Style Selector="ProgressBar"><Setter Property="Foreground" Value="#7961B4" /><Setter Property="Background" Value="#211A2B" /></Style>
+    <Style Selector="MenuFlyoutPresenter"><Setter Property="Background" Value="#16121D" /><Setter Property="BorderBrush" Value="#362C44" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="14" /><Setter Property="Padding" Value="6" /><Setter Property="MinWidth" Value="220" /></Style>
+    <Style Selector="MenuItem"><Setter Property="MinHeight" Value="44" /><Setter Property="Padding" Value="12,10" /><Setter Property="Margin" Value="2" /><Setter Property="CornerRadius" Value="8" /><Setter Property="Foreground" Value="#D6D2E3" /><Setter Property="FontSize" Value="13" /></Style>
+    <Style Selector="MenuItem.danger"><Setter Property="Foreground" Value="#D1A5B9" /></Style>
+    <Style Selector="Button.confirm-action"><Setter Property="Height" Value="46" /><Setter Property="MinHeight" Value="46" /><Setter Property="Padding" Value="10" /><Setter Property="CornerRadius" Value="12" /><Setter Property="BorderThickness" Value="1" /><Setter Property="HorizontalContentAlignment" Value="Center" /><Setter Property="VerticalContentAlignment" Value="Center" /></Style>
+    <Style Selector="Button.confirm-reject"><Setter Property="Background" Value="#1B151E" /><Setter Property="BorderBrush" Value="#3D2D3D" /><Setter Property="Foreground" Value="#D1B5C2" /></Style>
+    <Style Selector="Button.confirm-approve"><Setter Property="Background" Value="#241B32" /><Setter Property="BorderBrush" Value="#4C3865" /><Setter Property="Foreground" Value="#D6C2F0" /></Style>
+    <Style Selector="MenuFlyoutPresenter Separator"><Setter Property="Margin" Value="10,5" /><Setter Property="Background" Value="#302638" /></Style>
+    <Style Selector="Border.card"><Setter Property="Background" Value="#101015" /><Setter Property="BorderBrush" Value="#272330" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="16" /><Setter Property="Padding" Value="16" /></Style>
+    <Style Selector="Button.action"><Setter Property="MinHeight" Value="52" /></Style>
+    <Style Selector="Button.tile"><Setter Property="Height" Value="88" /></Style>
+    <Style Selector="Button.code"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Padding" Value="0" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+    <Style Selector="Button.setting"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="MinHeight" Value="54" /><Setter Property="Padding" Value="16" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+    <Style Selector="Button.accent"><Setter Property="Foreground" Value="#B1A1E5" /></Style>
+    <Style Selector="TextBox"><Setter Property="MinHeight" Value="44" /><Setter Property="CornerRadius" Value="12" /><Setter Property="Background" Value="#0E0E14" /><Setter Property="BorderBrush" Value="#2C2837" /><Setter Property="Foreground" Value="#DAD5E5" /><Setter Property="FontSize" Value="13" /></Style>
+    <Style Selector="ComboBox"><Setter Property="MinHeight" Value="46" /><Setter Property="CornerRadius" Value="12" /><Setter Property="Background" Value="#17151F" /><Setter Property="BorderBrush" Value="#2C2837" /></Style>
+  </Application.Styles>
+</Application>

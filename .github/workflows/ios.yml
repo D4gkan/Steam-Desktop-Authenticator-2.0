@@ -1,0 +1,266 @@
+name: iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, ios]
+    paths:
+      - 'src/SteamAuth/**'
+      - 'src/App/Core/FileEncryptor.cs'
+      - 'src/Mobile*/**'
+      - 'src/iOS/**'
+      - 'tests/Mobile.Core.Tests/**'
+      - '.github/workflows/ios.yml'
+      - 'tools/verify_ios_startup.py'
+      - 'tools/wait_for_ios_startup.py'
+      - 'tools/tests/test_wait_for_ios_startup.py'
+      - 'tools/boot_ios_simulator.py'
+      - 'tools/tests/test_boot_ios_simulator.py'
+  pull_request:
+    paths:
+      - 'src/SteamAuth/**'
+      - 'src/App/Core/FileEncryptor.cs'
+      - 'src/Mobile*/**'
+      - 'src/iOS/**'
+      - 'tests/Mobile.Core.Tests/**'
+      - '.github/workflows/ios.yml'
+      - 'tools/verify_ios_startup.py'
+      - 'tools/wait_for_ios_startup.py'
+      - 'tools/tests/test_wait_for_ios_startup.py'
+      - 'tools/boot_ios_simulator.py'
+      - 'tools/tests/test_boot_ios_simulator.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+
+jobs:
+  compatibility:
+    name: Desktop compatibility and mobile tests
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.401
+      - name: Build existing desktop client
+        run: dotnet build SteamDesktopAuthenticator.sln -c Release
+      - name: Build mobile UI preview
+        run: dotnet build src/Mobile.Desktop/Mobile.Desktop.csproj -c Release
+      - name: Test account compatibility and login
+        run: dotnet test tests/Mobile.Core.Tests/Mobile.Core.Tests.csproj -c Release
+
+  ipa:
+    name: Build iOS ${{ matrix.target }}
+    needs: compatibility
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [simulator, device]
+    # Standard Intel runners avoid the ARM64 capacity queue. The device binary
+    # remains ios-arm64; only the simulator must match the build host.
+    runs-on: macos-26-intel
+    timeout-minutes: 60
+    env:
+      # Paired with Microsoft's 10.0.401 workload set (iOS SDK 26.5.10318).
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: '10.0.401'
+      - name: Select pinned SDK instead of runner defaults
+        shell: bash
+        run: |
+          cat > global.json <<'JSON'
+          {"sdk":{"version":"10.0.401","rollForward":"disable"}}
+          JSON
+          dotnet --version
+      - name: Verify Xcode
+        run: xcodebuild -version
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        if: matrix.target == 'simulator'
+        with:
+          python-version: '3.13'
+      - name: Install screenshot verifier dependency
+        if: matrix.target == 'simulator'
+        run: python -m pip install --disable-pip-version-check Pillow==13.0.0
+      - name: Test native startup readiness detection
+        if: matrix.target == 'simulator'
+        run: python -m unittest discover -s tools/tests -p 'test_*.py'
+      - name: Install pinned iOS workload
+        run: dotnet workload install ios --version 10.0.401
+      - name: Build simulator startup check
+        if: matrix.target == 'simulator'
+        run: >-
+          dotnet build src/iOS/iOS.csproj -c Release -r iossimulator-x64 -warnaserror
+          -p:EnableCodeSigning=true
+          -p:CodesignKey=-
+          -p:CodesignRequireProvisioningProfile=false
+          -p:BuildIpa=false
+          -p:ArchiveOnBuild=false
+      - name: Boot a fresh iPhone simulator with bounded recovery
+        if: matrix.target == 'simulator'
+        timeout-minutes: 9
+        run: python tools/boot_ios_simulator.py --diagnostics-dir dist/ios/diagnostics --github-env "$GITHUB_ENV"
+      - name: Verify app stays running after launch
+        if: matrix.target == 'simulator'
+        timeout-minutes: 8
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/ios/diagnostics
+          device="$STARTUP_SIMULATOR"
+          app="$(find src/iOS/bin/Release/net10.0-ios/iossimulator-x64 -type d -name SdaMobile.app -print -quit)"
+          test -n "$app"
+          codesign --verify --deep --strict "$app"
+          xcrun simctl install "$device" "$app"
+          xcrun simctl launch --console-pty "$device" com.sda.mobile.ios > dist/ios/diagnostics/console.log 2>&1 &
+          python tools/wait_for_ios_startup.py dist/ios/diagnostics/console.log --marker 'SDA startup: passcode presented.' --timeout 180
+          pgrep -x SdaMobile | tee dist/ios/diagnostics/process-pids.txt
+          cat dist/ios/diagnostics/console.log
+          grep -q 'SDA startup: native host presented.' dist/ios/diagnostics/console.log
+          grep -q 'SDA startup: logo shown.' dist/ios/diagnostics/console.log
+          grep -q 'SDA startup: logo faded.' dist/ios/diagnostics/console.log
+          # Capture a detached foreground launch: closing an attached console can
+          # otherwise return to SpringBoard while the process is still observable.
+          data="$(xcrun simctl get_app_container "$device" com.sda.mobile.ios data)"
+          ready="$data/Documents/startup-ready.txt"
+          rm -f "$ready"
+          launch="$(xcrun simctl launch --terminate-running-process "$device" com.sda.mobile.ios)"
+          echo "$launch"
+          pid="${launch##*: }"
+          [[ "$pid" =~ ^[0-9]+$ ]]
+          python tools/wait_for_ios_startup.py "$ready" --marker "passcode-presented:$pid" --timeout 180 --exact
+          sleep 2
+          xcrun simctl io "$device" screenshot dist/ios/simulator-startup.png
+          python tools/verify_ios_startup.py dist/ios/simulator-startup.png
+      - name: Verify imports, codes, and vault passcodes on iOS
+        if: matrix.target == 'simulator'
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          device="$STARTUP_SIMULATOR"
+          xcrun simctl launch --terminate-running-process --console-pty "$device" com.sda.mobile.ios --sda-functional-check > dist/ios/diagnostics/functional-check.log 2>&1 &
+          for attempt in {1..150}; do
+            if grep -q 'SDA functional check: passed\|SDA functional check: FAILED' dist/ios/diagnostics/functional-check.log; then break; fi
+            sleep 1
+          done
+          cat dist/ios/diagnostics/functional-check.log
+          grep -q 'SDA functional check: passed' dist/ios/diagnostics/functional-check.log
+          xcrun simctl io "$device" screenshot dist/ios/simulator-functional-check.png
+          python tools/verify_ios_startup.py dist/ios/simulator-functional-check.png
+          data="$(xcrun simctl get_app_container "$device" com.sda.mobile.ios data)"
+          cp "$data/Documents/native-paste-editor.png" dist/ios/native-paste-editor.png
+          cp "$data/Documents/native-passcode.png" dist/ios/native-passcode.png
+          cp "$data/Documents/native-confirmations.png" dist/ios/native-confirmations.png
+      - name: Compile device app without signing credentials
+        if: matrix.target == 'device'
+        run: >-
+          dotnet publish src/iOS/iOS.csproj -c Release -r ios-arm64 -warnaserror
+          -p:EnableCodeSigning=false
+          -p:CodesignRequireProvisioningProfile=false
+          -p:BuildIpa=false
+          -p:ArchiveOnBuild=false
+          -p:ApplicationVersion=${{ github.run_number }}
+      - name: Package IPA for Sideloadly
+        if: matrix.target == 'device'
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$(find src/iOS/bin/Release/net10.0-ios/ios-arm64 -type d -name SdaMobile.app -print -quit)"
+          test -n "$app"
+          test -f "$app/SdaMobile"
+          test -d "$app/LaunchScreen.storyboardc"
+          mkdir -p dist/ios/Payload
+          ditto "$app" dist/ios/Payload/SdaMobile.app
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' dist/ios/Payload/SdaMobile.app/Info.plist
+          file dist/ios/Payload/SdaMobile.app/SdaMobile
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIcons:CFBundlePrimaryIcon:CFBundleIconName' dist/ios/Payload/SdaMobile.app/Info.plist
+          test -f dist/ios/Payload/SdaMobile.app/Assets.car
+          cd dist/ios
+          /usr/bin/zip -qry SDA-Mobile-iOS-unsigned.ipa Payload
+          shasum -a 256 SDA-Mobile-iOS-unsigned.ipa > SHA256SUMS.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: matrix.target == 'device'
+        with:
+          name: iOS-device-build
+          path: |
+            dist/ios/SDA-Mobile-iOS-unsigned.ipa
+            dist/ios/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: matrix.target == 'simulator'
+        with:
+          name: iOS-startup-check
+          path: |
+            dist/ios/simulator-startup.png
+            dist/ios/simulator-functional-check.png
+            dist/ios/native-paste-editor.png
+            dist/ios/native-passcode.png
+            dist/ios/native-confirmations.png
+            dist/ios/diagnostics/functional-check.log
+          if-no-files-found: error
+          retention-days: 1
+      - name: Collect startup diagnostics on failure
+        if: failure() && matrix.target == 'simulator'
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p dist/ios/diagnostics
+          xcrun simctl list devices > dist/ios/diagnostics/devices.txt
+          xcrun simctl spawn "${STARTUP_SIMULATOR:-booted}" log show --last 3m --style compact --predicate 'process == "SdaMobile"' > dist/ios/diagnostics/startup.log 2>&1 || true
+          cp dist/ios/simulator-startup.png dist/ios/diagnostics/ 2>/dev/null || true
+          find "$HOME/Library/Logs/DiagnosticReports" -maxdepth 1 -name 'SdaMobile*.ips' -exec cp {} dist/ios/diagnostics/ \; 2>/dev/null || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure() && matrix.target == 'simulator'
+        with:
+          name: iOS-startup-diagnostics
+          path: dist/ios/diagnostics/
+          retention-days: 7
+      - name: Stop the simulator and its attached console
+        if: always() && matrix.target == 'simulator'
+        timeout-minutes: 2
+        continue-on-error: true
+        shell: bash
+        run: |
+          if [ -n "${STARTUP_SIMULATOR:-}" ]; then
+            xcrun simctl terminate "$STARTUP_SIMULATOR" com.sda.mobile.ios || true
+            xcrun simctl shutdown "$STARTUP_SIMULATOR" || true
+          fi
+
+  artifact:
+    name: Assemble validated IPA
+    needs: ipa
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: iOS-device-build
+          path: dist/ios
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: iOS-startup-check
+          path: dist/ios
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: SDA-Mobile-iOS-unsigned
+          path: dist/ios/
+          if-no-files-found: error
+          retention-days: 14

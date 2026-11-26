@@ -18,7 +18,9 @@ namespace SteamAuth
 
         public static long GetSteamTime()
         {
-            if (!TimeAligner._aligned)
+            // iOS's native HTTP handler does not support synchronous Send. Mobile callers
+            // align asynchronously; when offline, fall back to the device clock.
+            if (!TimeAligner._aligned && !OperatingSystem.IsIOS())
             {
                 TimeAligner.AlignTime();
             }

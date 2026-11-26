@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <SupportedOSPlatformVersion>16.0</SupportedOSPlatformVersion>
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>SdaMobile</AssemblyName>
+    <ApplicationId>com.sda.mobile.ios</ApplicationId>
+    <ApplicationTitle>SDA Mobile</ApplicationTitle>
+    <ApplicationDisplayVersion>2.0.5</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <AppIcon>AppIcon</AppIcon>
+    <!-- Preserve reflection-based JSON models and interpret managed IL, including
+         Avalonia's generated XAML populate methods that fail in AOT-only startup. -->
+    <TrimMode>copy</TrimMode>
+    <UseInterpreter>true</UseInterpreter>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <CodesignRequireProvisioningProfile Condition="'$(EnableCodeSigning)' == 'false'">false</CodesignRequireProvisioningProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('iossimulator-'))">
+    <DefineConstants>$(DefineConstants);SDA_IOS_SIMULATOR</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.iOS" Version="11.3.12" />
+    <ProjectReference Include="../Mobile/Mobile.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(RuntimeIdentifier.StartsWith('iossimulator-'))">
+    <EmbeddedResource Include="../../tests/Mobile.Core.Tests/Fixtures/DesktopAccount.json" LogicalName="Sda.Tests.DesktopAccount.json" />
+  </ItemGroup>
+</Project>
